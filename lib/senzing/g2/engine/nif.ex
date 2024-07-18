@@ -343,6 +343,36 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
+  pub fn delete_record(env: beam.env, dataSource: []u8, recordId: []u8, loadId: ?[]u8, withInfo: bool) !beam.term {
+    var g2_dataSource = try beam.allocator.dupeZ(u8, dataSource);
+    var g2_recordId = try beam.allocator.dupeZ(u8, recordId);
+    var g2_loadId = if (loadId) |id| try beam.allocator.dupeZ(u8, id) else try beam.allocator.dupeZ(u8, "");
+
+    if (withInfo) {
+      var g2_flags: c_longlong = 0; // Reserved for future use, not currently used
+
+      var responseBuf: [*c]u8 = null;
+      var responseBufSize: usize = 1024;
+      var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+      defer beam.allocator.free(initialResponseBuf);
+      responseBuf = initialResponseBuf.ptr;
+
+      if (G2.G2_deleteRecordWithInfo(g2_dataSource, g2_recordId, g2_loadId, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+        var reason = try get_and_clear_last_exception(env);
+        return beam.make_error_pair(env, reason, .{});
+      }
+
+      return beam.make(env, .{ .ok, responseBuf }, .{});
+    }
+
+    if (G2.G2_deleteRecord(g2_dataSource, g2_recordId, g2_loadId) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .ok, .{});
+  }
+
   // TODO: Complete
   pub fn get_entity_by_record_id(env: beam.env, dataSource: []u8, recordId: []u8) !beam.term {
     var g2_dataSource = try beam.allocator.dupeZ(u8, dataSource);

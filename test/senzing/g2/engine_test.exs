@@ -202,4 +202,27 @@ defmodule Senzing.G2.EngineTest do
       assert {:ok, nil} = Engine.process_next_redo_record(return_info: true)
     end
   end
+
+  describe inspect(&Engine.delete_record/2) do
+    test "works", %{test: test} do
+      id = "#{inspect(__MODULE__)}.#{inspect(test)}"
+
+      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
+
+      assert :ok = Engine.delete_record(id, "TEST")
+
+      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
+
+      assert {:ok,
+              %{
+                "AFFECTED_ENTITIES" => _affected_entities,
+                "DATA_SOURCE" => "TEST",
+                "INTERESTING_ENTITIES" => %{"ENTITIES" => _entities},
+                "RECORD_ID" => ^id
+              }} = Engine.delete_record(id, "TEST", with_info: true)
+
+      # TODO: Use finished fn
+      assert {:error, {33, _message}} = Engine.Nif.get_entity_by_record_id("TEST", id)
+    end
+  end
 end
