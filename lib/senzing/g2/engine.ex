@@ -8,12 +8,36 @@ defmodule Senzing.G2.Engine do
   alias Senzing.G2
   alias Senzing.G2.Config
   alias Senzing.G2.ConfigManager
+  alias Senzing.G2.Engine.Flags
   alias Senzing.G2.Engine.Nif
   alias Senzing.G2.ResourceInit
 
   @type resource_init_option() ::
           {:verbose_logging, boolean()} | {:prime, boolean()} | {:config_id, integer()}
   @type resource_init_options() :: [resource_init_option()]
+
+  flags_typespec =
+    Flags.all()
+    |> Enum.flat_map(fn flag -> [flag, :"no_#{flag}"] end)
+    |> then(
+      &[
+        quote do
+          integer()
+        end
+        | &1
+      ]
+    )
+    |> Enum.reduce(&{:|, [], [&1, &2]})
+
+  @typedoc """
+  Flags to modify behaviour of function allowing the `flags` option.
+
+  You can pass a list of flags or integers. All flags are then or'ed together.
+  You can also pass a flag prefixed with `no_` to disable it.
+
+  See https://docs.senzing.com/flags/
+  """
+  @type flag :: unquote(flags_typespec)
 
   @typedoc """
   Record as a map
@@ -331,8 +355,8 @@ defmodule Senzing.G2.Engine do
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
       iex> # TODO: Use finished fn
-      iex> {:ok, json} = Senzing.G2.Engine.Nif.get_entity_by_record_id("TEST", "test id")
-      iex> %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}} = :json.decode(json)
+      iex> {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
+      ...>   Senzing.G2.Engine.get_entity_by_record_id("test id", "TEST")
       iex> :ok = Senzing.G2.Engine.reevaluate_entity(entity_id)
       iex> {:ok, %{"AFFECTED_ENTITIES" => [%{"ENTITY_ID" => ^entity_id}]}} =
       ...>   Senzing.G2.Engine.reevaluate_entity(entity_id, return_info: true)
@@ -462,9 +486,12 @@ defmodule Senzing.G2.Engine do
       iex> # record => %{"RECORD_ID" => "test id"}
   """
   @doc type: :getting_entities_and_records
-  @spec get_record(record_id :: record_id(), data_source :: data_source(), opts :: []) :: G2.result(record())
-  def get_record(record_id, data_source, _opts \\ []) do
-    with {:ok, response} <- Nif.get_record(data_source, record_id),
+  @spec get_record(record_id :: record_id(), data_source :: data_source(), opts :: [flags: flag() | [flag()]]) ::
+          G2.result(record())
+  def get_record(record_id, data_source, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :record_default_flags)
+
+    with {:ok, response} <- Nif.get_record(data_source, record_id, flags),
          do: {:ok, :json.decode(response)}
   end
 
@@ -476,14 +503,16 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      iex> {:ok, _record} = Senzing.G2.Engine.Nif.get_entity_by_record_id("TEST", "test id")
+      iex> {:ok, _record} = Senzing.G2.Engine.get_entity_by_record_id("test id", "TEST")
       iex> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}}
 
   """
   @doc type: :getting_entities_and_records
   @spec get_entity_by_record_id(record_id :: record_id(), data_source :: data_source(), opts :: []) :: G2.result(entity())
-  def get_entity_by_record_id(record_id, data_source, _opts \\ []) do
-    with {:ok, response} <- Nif.get_entity_by_record_id(data_source, record_id),
+  def get_entity_by_record_id(record_id, data_source, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :entity_default_flags)
+
+    with {:ok, response} <- Nif.get_entity_by_record_id(data_source, record_id, flags),
          do: {:ok, :json.decode(response)}
   end
 
@@ -503,8 +532,10 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :getting_entities_and_records
   @spec get_entity(entity_id :: entity_id(), opts :: []) :: G2.result(entity())
-  def get_entity(entity_id, _opts \\ []) do
-    with {:ok, response} <- Nif.get_entity(entity_id),
+  def get_entity(entity_id, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :entity_default_flags)
+
+    with {:ok, response} <- Nif.get_entity(entity_id, flags),
          do: {:ok, :json.decode(response)}
   end
 
@@ -521,8 +552,11 @@ defmodule Senzing.G2.Engine do
 
   """
   @doc type: :getting_entities_and_records
-  @spec get_virtual_entity(record_ids :: [{record_id(), data_source()}], opts :: []) :: G2.result(entity())
-  def get_virtual_entity(record_ids, _opts \\ []) do
+  @spec get_virtual_entity(record_ids :: [{record_id(), data_source()}], opts :: [flags: flag() | [flag()]]) ::
+          G2.result(entity())
+  def get_virtual_entity(record_ids, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :entity_default_flags)
+
     record_ids =
       record_ids
       |> Enum.map(fn {id, data_source} -> %{"DATA_SOURCE" => data_source, "RECORD_ID" => id} end)
@@ -530,7 +564,7 @@ defmodule Senzing.G2.Engine do
       |> :json.encode()
       |> IO.iodata_to_binary()
 
-    with {:ok, response} <- Nif.get_virtual_entity(record_ids),
+    with {:ok, response} <- Nif.get_virtual_entity(record_ids, flags),
          do: {:ok, :json.decode(response)}
   end
 

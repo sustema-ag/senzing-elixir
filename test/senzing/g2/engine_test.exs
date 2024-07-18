@@ -224,29 +224,52 @@ defmodule Senzing.G2.EngineTest do
   end
 
   describe inspect(&Engine.get_record/3) do
-    # TODO: Implement Flags
     test "works", %{test: test} do
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
 
-      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
+      assert :ok =
+               Engine.add_record(
+                 %{"RECORD_ID" => id, "RECORD_TYPE" => "ORGANIZATION", "PRIMARY_NAME_ORG" => "Apple"},
+                 "TEST"
+               )
 
-      assert {:ok, %{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id}} = Engine.get_record(id, "TEST")
+      assert {:ok, %{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id} = short_response} =
+               Engine.get_record(id, "TEST", flags: [:no_record_default_flags])
+
+      refute Map.has_key?(short_response, "JSON_DATA")
+
+      assert {:ok,
+              %{
+                "DATA_SOURCE" => "TEST",
+                "RECORD_ID" => ^id,
+                "JSON_DATA" => %{
+                  "PRIMARY_NAME_ORG" => "Apple"
+                }
+              }} = Engine.get_record(id, "TEST", flags: [:record_default_flags])
     end
   end
 
   describe inspect(&Engine.get_entity_by_record_id/3) do
-    # TODO: Implement Flags
     test "works", %{test: test} do
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
 
-      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
+      assert :ok =
+               Engine.add_record(
+                 %{"RECORD_ID" => id, "RECORD_TYPE" => "ORGANIZATION", "PRIMARY_NAME_ORG" => "Apple"},
+                 "TEST"
+               )
 
-      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => _entity_id}}} = Engine.get_entity_by_record_id(id, "TEST")
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => _entity_id} = short_response}} =
+               Engine.get_entity_by_record_id(id, "TEST", flags: :no_entity_default_flags)
+
+      refute Map.has_key?(short_response, "ENTITY_NAME")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => _entity_id, "ENTITY_NAME" => "Apple"}}} =
+               Engine.get_entity_by_record_id(id, "TEST", flags: [:entity_default_flags])
     end
   end
 
   describe inspect(&Engine.get_entity/2) do
-    # TODO: Implement Flags
     test "works", %{test: test} do
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
 
@@ -257,7 +280,6 @@ defmodule Senzing.G2.EngineTest do
   end
 
   describe inspect(&Engine.get_virtual_entity/2) do
-    # TODO: Implement Flags
     test "works", %{test: test} do
       id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
       id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"
