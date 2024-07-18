@@ -137,9 +137,9 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, config_json} = Senzing.G2.Config.save(config)
-      iex> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
-      iex> Senzing.G2.Engine.reinit(config_id)
+      ...> {:ok, config_json} = Senzing.G2.Config.save(config)
+      ...> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
+      ...> Senzing.G2.Engine.reinit(config_id)
       :ok
 
   """
@@ -171,7 +171,7 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> {:ok, id} = Senzing.G2.Engine.get_active_config_id()
-      iex> is_integer(id)
+      ...> is_integer(id)
       true
 
   """
@@ -187,7 +187,7 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> {:ok, {config, config_id}} = Senzing.G2.Engine.export_config()
-      iex> is_binary(config)
+      ...> is_binary(config)
       true
       iex> is_integer(config_id)
       true
@@ -205,7 +205,7 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> {:ok, %DateTime{}} = Senzing.G2.Engine.get_repository_last_modified()
-      iex> # {:ok, ~U[2024-04-02 11:23:14.613Z]}
+      ...> # {:ok, ~U[2024-04-02 11:23:14.613Z]}
 
   """
   @doc type: :initialization
@@ -234,28 +234,35 @@ defmodule Senzing.G2.Engine do
 
   ## Examples
 
-      iex> {:ok, {record_id, _info}} = Senzing.G2.Engine.add_record(
-      ...>   %{"RECORD_ID" => "test id"},
-      ...>   "TEST",
-      ...>   load_id: "test load",
-      ...>   record_id: "test id",
-      ...>   return_info: true,
-      ...>   return_record_id: true
-      ...> )
-      iex> # info => %{
+      iex> {:ok, {record_id, _info}} =
+      ...>   Senzing.G2.Engine.add_record(
+      ...>     %{"RECORD_ID" => "test id"},
+      ...>     "TEST",
+      ...>     load_id: "test load",
+      ...>     record_id: "test id",
+      ...>     return_info: true,
+      ...>     return_record_id: true
+      ...>   )
+      ...> 
+      ...> # info => %{
       ...> #   "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
       ...> #   "DATA_SOURCE" => "TEST",
       ...> #   "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
       ...> #   "RECORD_ID" => "test id"
       ...> # }
-      iex> record_id
+      ...> record_id
       "test id"
   """
   @doc type: :add_records
   @spec add_record(
           record :: record(),
           data_source :: data_source(),
-          opts :: [load_id: String.t(), return_info: boolean(), return_record_id: boolean(), record_id: record_id()]
+          opts :: [
+            load_id: String.t(),
+            return_info: boolean(),
+            return_record_id: boolean(),
+            record_id: record_id()
+          ]
         ) :: G2.result({record_id :: record_id() | nil, info :: record() | nil}) | G2.result()
   def add_record(record, data_source, opts \\ []) do
     with {:ok, {record_id, info}} <-
@@ -287,14 +294,16 @@ defmodule Senzing.G2.Engine do
 
   ## Examples
 
-      iex> {:ok, _info} = Senzing.G2.Engine.replace_record(
-      ...>   %{"RECORD_ID" => "test id"},
-      ...>   "test id",
-      ...>   "TEST",
-      ...>   load_id: "test load",
-      ...>   return_info: true
-      ...> )
-      iex> # info => %{
+      iex> {:ok, _info} =
+      ...>   Senzing.G2.Engine.replace_record(
+      ...>     %{"RECORD_ID" => "test id"},
+      ...>     "test id",
+      ...>     "TEST",
+      ...>     load_id: "test load",
+      ...>     return_info: true
+      ...>   )
+      ...> 
+      ...> # info => %{
       ...> #   "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
       ...> #   "DATA_SOURCE" => "TEST",
       ...> #   "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
@@ -329,20 +338,25 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      iex> {:ok, _info} = Senzing.G2.Engine.reevaluate_record("test id", "TEST", return_info: true)
-      iex> # info => %{
-      iex> #   "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
-      iex> #   "DATA_SOURCE" => "TEST",
-      iex> #   "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
-      iex> #   "RECORD_ID" => "test id"
-      iex> # }
+      ...> {:ok, _info} = Senzing.G2.Engine.reevaluate_record("test id", "TEST", return_info: true)
+      ...> # info => %{
+      ...> #   "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
+      ...> #   "DATA_SOURCE" => "TEST",
+      ...> #   "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+      ...> #   "RECORD_ID" => "test id"
+      ...> # }
 
   """
   @doc type: :reevaluating
-  @spec reevaluate_record(record_id :: record_id(), data_source :: data_source(), opts :: [return_info: boolean()]) ::
+  @spec reevaluate_record(
+          record_id :: record_id(),
+          data_source :: data_source(),
+          opts :: [return_info: boolean()]
+        ) ::
           G2.result() | G2.result(map())
   def reevaluate_record(record_id, data_source, opts \\ []) do
-    with {:ok, response} <- Nif.reevaluate_record(data_source, record_id, opts[:return_info] || false),
+    with {:ok, response} <-
+           Nif.reevaluate_record(data_source, record_id, opts[:return_info] || false),
          do: {:ok, :json.decode(response)}
   end
 
@@ -354,16 +368,19 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      iex> # TODO: Use finished fn
-      iex> {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
+      ...> # TODO: Use finished fn
+      ...> {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
       ...>   Senzing.G2.Engine.get_entity_by_record_id("test id", "TEST")
-      iex> :ok = Senzing.G2.Engine.reevaluate_entity(entity_id)
-      iex> {:ok, %{"AFFECTED_ENTITIES" => [%{"ENTITY_ID" => ^entity_id}]}} =
+      ...> 
+      ...> :ok = Senzing.G2.Engine.reevaluate_entity(entity_id)
+      ...> 
+      ...> {:ok, %{"AFFECTED_ENTITIES" => [%{"ENTITY_ID" => ^entity_id}]}} =
       ...>   Senzing.G2.Engine.reevaluate_entity(entity_id, return_info: true)
 
   """
   @doc type: :reevaluating
-  @spec reevaluate_entity(entity_id :: integer(), opts :: [return_info: boolean()]) :: G2.result() | G2.result(map())
+  @spec reevaluate_entity(entity_id :: integer(), opts :: [return_info: boolean()]) ::
+          G2.result() | G2.result(map())
   def reevaluate_entity(entity_id, opts \\ []) do
     with {:ok, response} <- Nif.reevaluate_entity(entity_id, opts[:return_info] || false),
          do: {:ok, :json.decode(response)}
@@ -377,7 +394,7 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> {:ok, _count} = Senzing.G2.Engine.count_redo_records()
-      iex> # count => 0
+      ...> # count => 0
   """
   @doc type: :redo_processing
   @spec count_redo_records :: G2.result(integer())
@@ -391,7 +408,7 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> {:ok, record} = Senzing.G2.Engine.get_redo_record()
-      iex> is_map(record) or is_nil(record)
+      ...> is_map(record) or is_nil(record)
       true
 
   """
@@ -419,9 +436,14 @@ defmodule Senzing.G2.Engine do
 
   """
   @doc type: :redo_processing
-  @spec process_redo_record(record :: redo_record(), opts :: [return_info: boolean()]) :: G2.result(map() | nil)
+  @spec process_redo_record(record :: redo_record(), opts :: [return_info: boolean()]) ::
+          G2.result(map() | nil)
   def process_redo_record(record, opts \\ []) do
-    with {:ok, info} <- Nif.process_redo_record(IO.iodata_to_binary(:json.encode(record)), opts[:return_info] || false),
+    with {:ok, info} <-
+           Nif.process_redo_record(
+             IO.iodata_to_binary(:json.encode(record)),
+             opts[:return_info] || false
+           ),
          do: {:ok, :json.decode(info)}
   end
 
@@ -436,16 +458,26 @@ defmodule Senzing.G2.Engine do
 
   """
   @doc type: :redo_processing
-  @spec process_next_redo_record(opts :: [return_info: boolean()]) :: G2.result({map(), map()} | map() | nil)
+  @spec process_next_redo_record(opts :: [return_info: boolean()]) ::
+          G2.result({map(), map()} | map() | nil)
   def process_next_redo_record(opts \\ []) do
     return_info = opts[:return_info] || false
 
     case Nif.process_next_redo_record(return_info) do
-      {:ok, {"", ""}} when return_info -> {:ok, nil}
-      {:ok, ""} when not return_info -> {:ok, nil}
-      {:ok, {response, info}} when return_info -> {:ok, {:json.decode(response), :json.decode(info)}}
-      {:ok, response} when not return_info -> {:ok, :json.decode(response)}
-      {:error, reason} -> {:error, reason}
+      {:ok, {"", ""}} when return_info ->
+        {:ok, nil}
+
+      {:ok, ""} when not return_info ->
+        {:ok, nil}
+
+      {:ok, {response, info}} when return_info ->
+        {:ok, {:json.decode(response), :json.decode(info)}}
+
+      {:ok, response} when not return_info ->
+        {:ok, :json.decode(response)}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -460,7 +492,7 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      iex> :ok = Senzing.G2.Engine.delete_record("test id", "TEST")
+      ...> :ok = Senzing.G2.Engine.delete_record("test id", "TEST")
 
   """
   @doc type: :deleting_records
@@ -470,7 +502,8 @@ defmodule Senzing.G2.Engine do
           opts :: [with_info: boolean(), load_id: String.t()]
         ) :: G2.result() | G2.result(map())
   def delete_record(record_id, data_source, opts \\ []) do
-    with {:ok, response} <- Nif.delete_record(data_source, record_id, opts[:load_id], opts[:with_info] || false),
+    with {:ok, response} <-
+           Nif.delete_record(data_source, record_id, opts[:load_id], opts[:with_info] || false),
          do: {:ok, :json.decode(response)}
   end
 
@@ -482,11 +515,15 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      iex> {:ok, _record} = Senzing.G2.Engine.get_record("test id", "TEST")
-      iex> # record => %{"RECORD_ID" => "test id"}
+      ...> {:ok, _record} = Senzing.G2.Engine.get_record("test id", "TEST")
+      ...> # record => %{"RECORD_ID" => "test id"}
   """
   @doc type: :getting_entities_and_records
-  @spec get_record(record_id :: record_id(), data_source :: data_source(), opts :: [flags: flag() | [flag()]]) ::
+  @spec get_record(
+          record_id :: record_id(),
+          data_source :: data_source(),
+          opts :: [flags: flag() | [flag()]]
+        ) ::
           G2.result(record())
   def get_record(record_id, data_source, opts \\ []) do
     flags = Flags.normalize(opts[:flags], :record_default_flags)
@@ -503,12 +540,16 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      iex> {:ok, _record} = Senzing.G2.Engine.get_entity_by_record_id("test id", "TEST")
-      iex> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}}
+      ...> {:ok, _record} = Senzing.G2.Engine.get_entity_by_record_id("test id", "TEST")
+      ...> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}}
 
   """
   @doc type: :getting_entities_and_records
-  @spec get_entity_by_record_id(record_id :: record_id(), data_source :: data_source(), opts :: []) :: G2.result(entity())
+  @spec get_entity_by_record_id(
+          record_id :: record_id(),
+          data_source :: data_source(),
+          opts :: []
+        ) :: G2.result(entity())
   def get_entity_by_record_id(record_id, data_source, opts \\ []) do
     flags = Flags.normalize(opts[:flags], :entity_default_flags)
 
@@ -524,10 +565,12 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      iex> {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
+      ...> 
+      ...> {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
       ...>   Senzing.G2.Engine.get_entity_by_record_id("test id", "TEST")
-      iex> {:ok, _record} = Senzing.G2.Engine.get_entity(entity_id)
-      iex> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 7}}
+      ...> 
+      ...> {:ok, _record} = Senzing.G2.Engine.get_entity(entity_id)
+      ...> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 7}}
 
   """
   @doc type: :getting_entities_and_records
@@ -547,12 +590,15 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      iex> {:ok, _record} = Senzing.G2.Engine.get_virtual_entity([{"test id", "TEST"}])
-      iex> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}}
+      ...> {:ok, _record} = Senzing.G2.Engine.get_virtual_entity([{"test id", "TEST"}])
+      ...> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}}
 
   """
   @doc type: :getting_entities_and_records
-  @spec get_virtual_entity(record_ids :: [{record_id(), data_source()}], opts :: [flags: flag() | [flag()]]) ::
+  @spec get_virtual_entity(
+          record_ids :: [{record_id(), data_source()}],
+          opts :: [flags: flag() | [flag()]]
+        ) ::
           G2.result(entity())
   def get_virtual_entity(record_ids, opts \\ []) do
     flags = Flags.normalize(opts[:flags], :entity_default_flags)

@@ -61,9 +61,9 @@ defmodule Senzing.G2.ConfigManager do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, config_json} = Senzing.G2.Config.save(config)
-      iex> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
-      iex> is_integer(config_id)
+      ...> {:ok, config_json} = Senzing.G2.Config.save(config)
+      ...> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
+      ...> is_integer(config_id)
       true
 
   """
@@ -78,10 +78,10 @@ defmodule Senzing.G2.ConfigManager do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, config_json} = Senzing.G2.Config.save(config)
-      iex> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
-      iex> {:ok, config_json} = Senzing.G2.ConfigManager.get_config(config_id)
-      iex> is_binary(config_json)
+      ...> {:ok, config_json} = Senzing.G2.Config.save(config)
+      ...> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
+      ...> {:ok, config_json} = Senzing.G2.ConfigManager.get_config(config_id)
+      ...> is_binary(config_json)
       true
 
   """
@@ -96,7 +96,8 @@ defmodule Senzing.G2.ConfigManager do
   ## Examples
 
       iex> {:ok, configs} = Senzing.G2.ConfigManager.list_configs()
-      iex> # {:ok, [%{"CONFIG_COMMENTS" => "comment", "CONFIG_ID" => 1990907876, "SYS_CREATE_DT" => "2024-02-22 19:46:22.556"}]}
+      ...> 
+      ...> # {:ok, [%{"CONFIG_COMMENTS" => "comment", "CONFIG_ID" => 1990907876, "SYS_CREATE_DT" => "2024-02-22 19:46:22.556"}]}
 
   """
   @spec list_configs() :: G2.result([config_parameters()])
@@ -114,7 +115,7 @@ defmodule Senzing.G2.ConfigManager do
   ## Examples
 
       iex> {:ok, default_config_id} = Senzing.G2.ConfigManager.get_default_config_id()
-      iex> is_integer(default_config_id)
+      ...> is_integer(default_config_id)
       true
 
   """
@@ -129,11 +130,11 @@ defmodule Senzing.G2.ConfigManager do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, config_json} = Senzing.G2.Config.save(config)
-      iex> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
-      iex> :ok = Senzing.G2.ConfigManager.set_default_config_id(config_id)
-      iex> {:ok, default_config_id} = Senzing.G2.ConfigManager.get_default_config_id()
-      iex> config_id == default_config_id
+      ...> {:ok, config_json} = Senzing.G2.Config.save(config)
+      ...> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
+      ...> :ok = Senzing.G2.ConfigManager.set_default_config_id(config_id)
+      ...> {:ok, default_config_id} = Senzing.G2.ConfigManager.get_default_config_id()
+      ...> config_id == default_config_id
       true
 
   """
@@ -148,16 +149,20 @@ defmodule Senzing.G2.ConfigManager do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, config_json} = Senzing.G2.Config.save(config)
-      iex> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
-      iex> :ok = Senzing.G2.ConfigManager.set_default_config_id(config_id)
-      iex> {:ok, new_config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
-      iex> :ok = Senzing.G2.ConfigManager.replace_default_config_id(new_config_id, config_id)
-      iex> {:ok, default_config_id} = Senzing.G2.ConfigManager.get_default_config_id()
-      iex> new_config_id == default_config_id
+      ...> {:ok, config_json} = Senzing.G2.Config.save(config)
+      ...> {:ok, config_id} = Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
+      ...> :ok = Senzing.G2.ConfigManager.set_default_config_id(config_id)
+      ...> 
+      ...> {:ok, new_config_id} =
+      ...>   Senzing.G2.ConfigManager.add_config(config_json, comment: "comment")
+      ...> 
+      ...> :ok = Senzing.G2.ConfigManager.replace_default_config_id(new_config_id, config_id)
+      ...> {:ok, default_config_id} = Senzing.G2.ConfigManager.get_default_config_id()
+      ...> new_config_id == default_config_id
       true
 
   """
-  @spec replace_default_config_id(new_config_id :: config_id(), old_config_id :: config_id()) :: G2.result()
+  @spec replace_default_config_id(new_config_id :: config_id(), old_config_id :: config_id()) ::
+          G2.result()
   defdelegate replace_default_config_id(new_config_id, old_config_id), to: Nif
 end

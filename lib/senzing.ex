@@ -8,7 +8,8 @@ defmodule Senzing do
   @doc false
   @spec locate_root_path() :: Path.t()
   def locate_root_path do
-    path = System.get_env("SENZING_ROOT", Application.get_env(:senzing, :root_path, "/opt/senzing"))
+    path =
+      System.get_env("SENZING_ROOT", Application.get_env(:senzing, :root_path, "/opt/senzing"))
 
     unless File.exists?(Path.join(path, "data")) do
       raise """

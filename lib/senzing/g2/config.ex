@@ -99,7 +99,8 @@ defmodule Senzing.G2.Config do
   def handle_call({:add_data_source, data_source}, _from, config) do
     {:reply,
      with(
-       {:ok, response} <- Nif.add_data_source(config, IO.iodata_to_binary(:json.encode(data_source))),
+       {:ok, response} <-
+         Nif.add_data_source(config, IO.iodata_to_binary(:json.encode(data_source))),
        do: {:ok, :json.decode(response)}
      ), config}
   end
@@ -149,8 +150,8 @@ defmodule Senzing.G2.Config do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, _json} = Senzing.G2.Config.save(config)
-      iex> # {:ok, "{\"G2_CONFIG\": \"...\"}"}
+      ...> {:ok, _json} = Senzing.G2.Config.save(config)
+      ...> # {:ok, "{\"G2_CONFIG\": \"...\"}"}
 
   """
   @doc type: :configuration_object_management
@@ -165,11 +166,12 @@ defmodule Senzing.G2.Config do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, _data_sources} = Senzing.G2.Config.list_data_sources(config)
-      {:ok, [
-        %{"DSRC_CODE" => "TEST", "DSRC_ID" => 1},
-        %{"DSRC_CODE" => "SEARCH", "DSRC_ID" => 2}
-      ]}
+      ...> {:ok, _data_sources} = Senzing.G2.Config.list_data_sources(config)
+      {:ok,
+       [
+         %{"DSRC_CODE" => "TEST", "DSRC_ID" => 1},
+         %{"DSRC_CODE" => "SEARCH", "DSRC_ID" => 2}
+       ]}
 
   """
   @doc type: :datasource_management
@@ -184,13 +186,17 @@ defmodule Senzing.G2.Config do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, _data_source} = Senzing.G2.Config.add_data_source(config, %{"DSRC_CODE" => "NAME_OF_DATASOURCE"})
-      iex> {:ok, _data_sources} = Senzing.G2.Config.list_data_sources(config)
-      {:ok, [
-        %{"DSRC_CODE" => "TEST", "DSRC_ID" => 1},
-        %{"DSRC_CODE" => "SEARCH", "DSRC_ID" => 2},
-        %{"DSRC_CODE" => "NAME_OF_DATASOURCE", "DSRC_ID" => 1001}
-      ]}
+      ...> 
+      ...> {:ok, _data_source} =
+      ...>   Senzing.G2.Config.add_data_source(config, %{"DSRC_CODE" => "NAME_OF_DATASOURCE"})
+      ...> 
+      ...> {:ok, _data_sources} = Senzing.G2.Config.list_data_sources(config)
+      {:ok,
+       [
+         %{"DSRC_CODE" => "TEST", "DSRC_ID" => 1},
+         %{"DSRC_CODE" => "SEARCH", "DSRC_ID" => 2},
+         %{"DSRC_CODE" => "NAME_OF_DATASOURCE", "DSRC_ID" => 1001}
+       ]}
 
   """
   @doc type: :datasource_management
@@ -206,16 +212,23 @@ defmodule Senzing.G2.Config do
   ## Examples
 
       iex> {:ok, config} = Senzing.G2.Config.start_link([])
-      iex> {:ok, _data_source} = Senzing.G2.Config.add_data_source(config, %{"DSRC_CODE" => "NAME_OF_DATASOURCE"})
-      iex> :ok = Senzing.G2.Config.delete_data_source(config, %{"DSRC_CODE" => "NAME_OF_DATASOURCE"})
-      iex> {:ok, _data_sources} = Senzing.G2.Config.list_data_sources(config)
-      {:ok, [
-        %{"DSRC_CODE" => "TEST", "DSRC_ID" => 1},
-        %{"DSRC_CODE" => "SEARCH", "DSRC_ID" => 2}
-      ]}
+      ...> 
+      ...> {:ok, _data_source} =
+      ...>   Senzing.G2.Config.add_data_source(config, %{"DSRC_CODE" => "NAME_OF_DATASOURCE"})
+      ...> 
+      ...> :ok =
+      ...>   Senzing.G2.Config.delete_data_source(config, %{"DSRC_CODE" => "NAME_OF_DATASOURCE"})
+      ...> 
+      ...> {:ok, _data_sources} = Senzing.G2.Config.list_data_sources(config)
+      {:ok,
+       [
+         %{"DSRC_CODE" => "TEST", "DSRC_ID" => 1},
+         %{"DSRC_CODE" => "SEARCH", "DSRC_ID" => 2}
+       ]}
 
   """
   @doc type: :datasource_management
-  @spec delete_data_source(server :: GenServer.server(), data_source :: data_source()) :: G2.result()
+  @spec delete_data_source(server :: GenServer.server(), data_source :: data_source()) ::
+          G2.result()
   def delete_data_source(server, data_source), do: GenServer.call(server, {:delete_data_source, data_source})
 end
