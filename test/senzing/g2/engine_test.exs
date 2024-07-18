@@ -257,7 +257,6 @@ defmodule Senzing.G2.EngineTest do
   end
 
   describe inspect(&Engine.get_virtual_entity/2) do
-    # TODO: Implement Flags
     test "works", %{test: test} do
       id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
       id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"

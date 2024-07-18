@@ -428,9 +428,8 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
-  pub fn get_virtual_entity(env: beam.env, recordIds: []u8) !beam.term {
+  pub fn get_virtual_entity(env: beam.env, recordIds: []u8, flags: c_longlong) !beam.term {
     var g2_recordIds = try beam.allocator.dupeZ(u8, recordIds);
-    var g2_flags: c_longlong = 1 << 12; // TODO: Implement
 
     var responseBuf: [*c]u8 = null;
     var responseBufSize: usize = 1024;
@@ -438,7 +437,7 @@ defmodule Senzing.G2.Engine.Nif do
     defer beam.allocator.free(initialResponseBuf);
     responseBuf = initialResponseBuf.ptr;
 
-    if (G2.G2_getVirtualEntityByRecordID_V2(g2_recordIds, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+    if (G2.G2_getVirtualEntityByRecordID_V2(g2_recordIds, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
       var reason = try get_and_clear_last_exception(env);
       return beam.make_error_pair(env, reason, .{});
     }

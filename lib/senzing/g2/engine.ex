@@ -8,12 +8,31 @@ defmodule Senzing.G2.Engine do
   alias Senzing.G2
   alias Senzing.G2.Config
   alias Senzing.G2.ConfigManager
+  alias Senzing.G2.Engine.Flags
   alias Senzing.G2.Engine.Nif
   alias Senzing.G2.ResourceInit
 
   @type resource_init_option() ::
           {:verbose_logging, boolean()} | {:prime, boolean()} | {:config_id, integer()}
   @type resource_init_options() :: [resource_init_option()]
+
+  flags_typespec =
+    Flags.all()
+    |> Enum.flat_map(fn flag -> [flag, :"no_#{flag}"] end)
+    |> then(
+      &[
+        quote do
+          integer()
+        end
+        | &1
+      ]
+    )
+    |> Enum.reduce(&{:|, [], [&1, &2]})
+
+  @typedoc """
+  See https://docs.senzing.com/flags/
+  """
+  @type flag :: unquote(flags_typespec)
 
   @typedoc """
   Record as a map
@@ -521,8 +540,11 @@ defmodule Senzing.G2.Engine do
 
   """
   @doc type: :getting_entities_and_records
-  @spec get_virtual_entity(record_ids :: [{record_id(), data_source()}], opts :: []) :: G2.result(entity())
-  def get_virtual_entity(record_ids, _opts \\ []) do
+  @spec get_virtual_entity(record_ids :: [{record_id(), data_source()}], opts :: [flags: flag() | [flag()]]) ::
+          G2.result(entity())
+  def get_virtual_entity(record_ids, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :g2_entity_default_flags)
+
     record_ids =
       record_ids
       |> Enum.map(fn {id, data_source} -> %{"DATA_SOURCE" => data_source, "RECORD_ID" => id} end)
@@ -530,7 +552,7 @@ defmodule Senzing.G2.Engine do
       |> :json.encode()
       |> IO.iodata_to_binary()
 
-    with {:ok, response} <- Nif.get_virtual_entity(record_ids),
+    with {:ok, response} <- Nif.get_virtual_entity(record_ids, flags),
          do: {:ok, :json.decode(response)}
   end
 
