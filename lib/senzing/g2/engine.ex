@@ -422,6 +422,31 @@ defmodule Senzing.G2.Engine do
     end
   end
 
+  @doc """
+  This method is used to delete observation data from the system.
+
+  This removes a single entity observation record, by removing all of its
+  feature data and the observation itself.
+
+  See https://docs.senzing.com/python/3/g2engine/deleting/index.html#deleterecord
+
+  ## Examples
+
+      iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
+      iex> :ok = Senzing.G2.Engine.delete_record("test id", "TEST")
+
+  """
+  @doc type: :deleting_records
+  @spec delete_record(
+          record_id :: record_id(),
+          data_source :: data_source(),
+          opts :: [with_info: boolean(), load_id: String.t()]
+        ) :: G2.result() | G2.result(map())
+  def delete_record(record_id, data_source, opts \\ []) do
+    with {:ok, response} <- Nif.delete_record(data_source, record_id, opts[:load_id], opts[:with_info] || false),
+         do: {:ok, :json.decode(response)}
+  end
+
   # This method will destroy and perform cleanup for the G2 processing object.
   #
   # It should be called after all other calls are complete.
