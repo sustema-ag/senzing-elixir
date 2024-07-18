@@ -632,7 +632,7 @@ defmodule Senzing.G2.Engine do
   @spec search_by_attributes(
           attributes :: map(),
           opts :: [flags: flag() | [flag()], search_profile: String.t()]
-        ) :: G2.result([entity()])
+        ) :: G2.result(map())
   def search_by_attributes(attributes, opts \\ []) do
     flags = Flags.normalize(opts[:flags], :search_by_attributes_default_flags)
 
@@ -644,6 +644,166 @@ defmodule Senzing.G2.Engine do
            ),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc """
+  This method is used to find a relationship path between entities.
+
+  See https://docs.senzing.com/python/3/g2engine/finding_paths/index.html#findpathbyentityid
+
+  ## Examples
+
+      iex> _result = Senzing.G2.Engine.find_path_by_entity_id(1, 2, 10)
+      ...> # result => {:ok, %{"ENTITY_PATHS" => [%{"ENTITIES" => [1, 2]}]}}
+
+  """
+  @doc type: :finding_paths
+  @spec find_path_by_entity_id(
+          start_entity_id :: entity_id(),
+          end_entity_id :: entity_id(),
+          max_degree :: pos_integer(),
+          opts :: [
+            flags: flag() | [flag()],
+            exclude: [entity_id],
+            included_data_sources: [data_source()]
+          ]
+        ) :: G2.result(map())
+  def find_path_by_entity_id(start_entity_id, end_entity_id, max_degree, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :find_path_default_flags)
+
+    exclude =
+      opts
+      |> Keyword.fetch(:exclude)
+      |> case do
+        :error ->
+          nil
+
+        {:ok, exclude} ->
+          exclude
+          |> Enum.map(&%{"ENTITY_ID" => &1})
+          |> then(&%{"ENTITIES" => &1})
+          |> :json.encode()
+          |> IO.iodata_to_binary()
+      end
+
+    included_data_sources =
+      opts
+      |> Keyword.fetch(:included_data_sources)
+      |> case do
+        :error ->
+          nil
+
+        {:ok, data_sources} ->
+          data_sources
+          |> then(&%{"DATA_SOURCES" => &1})
+          |> :json.encode()
+          |> IO.iodata_to_binary()
+      end
+
+    with {:ok, response} <-
+           Nif.find_path_by_entity_id(
+             start_entity_id,
+             end_entity_id,
+             max_degree,
+             flags,
+             exclude,
+             included_data_sources
+           ),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method is used to find a relationship path between records.
+
+  See https://docs.senzing.com/python/3/g2engine/finding_paths/index.html#findpathbyrecordid
+
+  ## Examples
+
+      iex> _result =
+      ...>   Senzing.G2.Engine.find_path_by_record_id(
+      ...>     {"test id 1", "TEST"},
+      ...>     {"test id 2", "TEST"},
+      ...>     10
+      ...>   )
+      ...> 
+      ...> # result => {:ok, %{"ENTITY_PATHS" => [%{"ENTITIES" => [1, 2]}]}}
+
+  """
+  @doc type: :finding_paths
+  @spec find_path_by_record_id(
+          start_record :: {record_id(), data_source()},
+          end_record :: {record_id(), data_source()},
+          max_degree :: pos_integer(),
+          opts :: [
+            flags: flag() | [flag()],
+            exclude: [{record_id(), data_source()}],
+            included_data_sources: [data_source()]
+          ]
+        ) :: G2.result(map())
+  def find_path_by_record_id(start_record, end_record, max_degree, opts \\ []) do
+    {start_record_id, start_record_data_source} = start_record
+    {end_record_id, end_record_data_source} = end_record
+
+    flags = Flags.normalize(opts[:flags], :find_path_default_flags)
+
+    exclude =
+      opts
+      |> Keyword.fetch(:exclude)
+      |> case do
+        :error ->
+          nil
+
+        {:ok, exclude} ->
+          exclude
+          |> Enum.map(fn {record_id, data_source} ->
+            %{"DATA_SOURCE" => data_source, "RECORD_ID" => record_id}
+          end)
+          |> then(&%{"RECORDS" => &1})
+          |> :json.encode()
+          |> IO.iodata_to_binary()
+      end
+
+    included_data_sources =
+      opts
+      |> Keyword.fetch(:included_data_sources)
+      |> case do
+        :error ->
+          nil
+
+        {:ok, data_sources} ->
+          data_sources
+          |> then(&%{"DATA_SOURCES" => &1})
+          |> :json.encode()
+          |> IO.iodata_to_binary()
+      end
+
+    with {:ok, response} <-
+           Nif.find_path_by_record_id(
+             start_record_id,
+             start_record_data_source,
+             end_record_id,
+             end_record_data_source,
+             max_degree,
+             flags,
+             exclude,
+             included_data_sources
+           ),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This is used to purge all data from an existing repository
+
+  See https://docs.senzing.com/python/3/g2engine/cleanup/index.html#purgerepository
+
+  ## Examples
+
+      iex> Senzing.G2.Engine.purge_repository()
+      :ok
+
+  """
+  @doc type: :cleanup
+  @spec purge_repository() :: G2.result()
+  defdelegate purge_repository, to: Nif
 
   # This method will destroy and perform cleanup for the G2 processing object.
   #
