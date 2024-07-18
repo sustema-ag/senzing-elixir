@@ -373,10 +373,9 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .ok, .{});
   }
 
-  pub fn get_record(env: beam.env, dataSource: []u8, recordId: []u8) !beam.term {
+  pub fn get_record(env: beam.env, dataSource: []u8, recordId: []u8, flags: c_longlong) !beam.term {
     var g2_dataSource = try beam.allocator.dupeZ(u8, dataSource);
     var g2_recordId = try beam.allocator.dupeZ(u8, recordId);
-    var g2_flags: c_longlong = 0; // TODO: Implement
 
     var responseBuf: [*c]u8 = null;
     var responseBufSize: usize = 1024;
@@ -384,7 +383,7 @@ defmodule Senzing.G2.Engine.Nif do
     defer beam.allocator.free(initialResponseBuf);
     responseBuf = initialResponseBuf.ptr;
 
-    if (G2.G2_getRecord_V2(g2_dataSource, g2_recordId, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+    if (G2.G2_getRecord_V2(g2_dataSource, g2_recordId, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
       var reason = try get_and_clear_last_exception(env);
       return beam.make_error_pair(env, reason, .{});
     }
@@ -392,10 +391,9 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
-  pub fn get_entity_by_record_id(env: beam.env, dataSource: []u8, recordId: []u8) !beam.term {
+  pub fn get_entity_by_record_id(env: beam.env, dataSource: []u8, recordId: []u8, flags: c_longlong) !beam.term {
     var g2_dataSource = try beam.allocator.dupeZ(u8, dataSource);
     var g2_recordId = try beam.allocator.dupeZ(u8, recordId);
-    var g2_flags: c_longlong = 0; // TODO: Implement
 
     var responseBuf: [*c]u8 = null;
     var responseBufSize: usize = 1024;
@@ -403,7 +401,7 @@ defmodule Senzing.G2.Engine.Nif do
     defer beam.allocator.free(initialResponseBuf);
     responseBuf = initialResponseBuf.ptr;
 
-    if (G2.G2_getEntityByRecordID_V2(g2_dataSource, g2_recordId, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+    if (G2.G2_getEntityByRecordID_V2(g2_dataSource, g2_recordId, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
       var reason = try get_and_clear_last_exception(env);
       return beam.make_error_pair(env, reason, .{});
     }
@@ -411,16 +409,14 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
-  pub fn get_entity(env: beam.env, entityId: c_longlong) !beam.term {
-    var g2_flags: c_longlong = 0; // TODO: Implement
-
+  pub fn get_entity(env: beam.env, entityId: c_longlong, flags: c_longlong) !beam.term {
     var responseBuf: [*c]u8 = null;
     var responseBufSize: usize = 1024;
     var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
     defer beam.allocator.free(initialResponseBuf);
     responseBuf = initialResponseBuf.ptr;
 
-    if (G2.G2_getEntityByEntityID_V2(entityId, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+    if (G2.G2_getEntityByEntityID_V2(entityId, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
       var reason = try get_and_clear_last_exception(env);
       return beam.make_error_pair(env, reason, .{});
     }
@@ -428,9 +424,8 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
-  pub fn get_virtual_entity(env: beam.env, recordIds: []u8) !beam.term {
+  pub fn get_virtual_entity(env: beam.env, recordIds: []u8, flags: c_longlong) !beam.term {
     var g2_recordIds = try beam.allocator.dupeZ(u8, recordIds);
-    var g2_flags: c_longlong = 1 << 12; // TODO: Implement
 
     var responseBuf: [*c]u8 = null;
     var responseBufSize: usize = 1024;
@@ -438,7 +433,7 @@ defmodule Senzing.G2.Engine.Nif do
     defer beam.allocator.free(initialResponseBuf);
     responseBuf = initialResponseBuf.ptr;
 
-    if (G2.G2_getVirtualEntityByRecordID_V2(g2_recordIds, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+    if (G2.G2_getVirtualEntityByRecordID_V2(g2_recordIds, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
       var reason = try get_and_clear_last_exception(env);
       return beam.make_error_pair(env, reason, .{});
     }
