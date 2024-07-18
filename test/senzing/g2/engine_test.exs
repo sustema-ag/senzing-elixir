@@ -144,4 +144,32 @@ defmodule Senzing.G2.EngineTest do
                )
     end
   end
+
+  describe inspect(&Engine.reevaluate_record/3) do
+    test "works", %{test: test} do
+      id = "#{inspect(__MODULE__)}.#{inspect(test)}"
+
+      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST", load_id: id)
+
+      assert :ok = Engine.reevaluate_record(id, "TEST")
+      assert {:ok, %{"RECORD_ID" => ^id}} = Engine.reevaluate_record(id, "TEST", return_info: true)
+    end
+  end
+
+  describe inspect(&Engine.reevaluate_entity/2) do
+    test "works", %{test: test} do
+      id = "#{inspect(__MODULE__)}.#{inspect(test)}"
+
+      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
+
+      # TODO: Use finished fn
+      assert {:ok, json} = Engine.Nif.get_entity_by_record_id("TEST", id)
+      assert %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}} = :json.decode(json)
+
+      assert :ok = Engine.reevaluate_entity(entity_id)
+
+      assert {:ok, %{"AFFECTED_ENTITIES" => [%{"ENTITY_ID" => ^entity_id}]}} =
+               Engine.reevaluate_entity(entity_id, return_info: true)
+    end
+  end
 end

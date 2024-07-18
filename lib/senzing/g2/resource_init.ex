@@ -60,7 +60,7 @@ defmodule Senzing.G2.ResourceInit do
 
     Process.flag(:trap_exit, true)
 
-    Logger.info("Starting #{inspect(mod)} with name #{inspect(name)}")
+    Logger.debug("Starting #{inspect(mod)} with name #{inspect(name)}")
 
     case mod.resource_init(name, ini_params, options) do
       :ok -> {:ok, mod}
@@ -75,7 +75,7 @@ defmodule Senzing.G2.ResourceInit do
   @doc false
   @impl GenServer
   def terminate(_reason, mod) do
-    Logger.info("Stopping #{inspect(mod)}")
+    Logger.debug("Stopping #{inspect(mod)}")
 
     mod.resource_destroy()
   end
