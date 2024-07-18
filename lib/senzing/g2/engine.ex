@@ -274,7 +274,7 @@ defmodule Senzing.G2.Engine do
       ...> #   "RECORD_ID" => "test id"
       ...> # }
   """
-  @doc type: :add_records
+  @doc type: :replace_records
   @spec replace_record(
           record :: record(),
           record_id :: record_id(),

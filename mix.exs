@@ -65,6 +65,7 @@ defmodule Senzing.MixProject do
         # Engine
         "Functions: Initialization": &(&1[:type] == :initialization),
         "Functions: Add Records": &(&1[:type] == :add_records),
+        "Functions: Replace Records": &(&1[:type] == :replace_records),
         "Functions: Reevaluating": &(&1[:type] == :reevaluating),
         "Functions: Redo Processing": &(&1[:type] == :redo_processing),
         "Functions: Deleting Records": &(&1[:type] == :deleting_records),
