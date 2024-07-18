@@ -172,4 +172,34 @@ defmodule Senzing.G2.EngineTest do
                Engine.reevaluate_entity(entity_id, return_info: true)
     end
   end
+
+  describe inspect(&Engine.count_redo_records/0) do
+    test "works" do
+      assert {:ok, count} = Engine.count_redo_records()
+      assert is_integer(count)
+      assert count >= 0
+    end
+  end
+
+  describe inspect(&Engine.get_redo_record/0) do
+    test "works" do
+      assert {:ok, record} = Engine.get_redo_record()
+      assert is_map(record) or is_nil(record)
+      # TODO: How can I trigger a redo so that I can test this properly?
+    end
+  end
+
+  describe inspect(&Engine.process_redo_record/2) do
+    test "works" do
+      # TODO: How to test?
+    end
+  end
+
+  describe inspect(&Engine.process_next_redo_record/1) do
+    test "works" do
+      # TODO: How to test?
+      assert {:ok, nil} = Engine.process_next_redo_record()
+      assert {:ok, nil} = Engine.process_next_redo_record(return_info: true)
+    end
+  end
 end
