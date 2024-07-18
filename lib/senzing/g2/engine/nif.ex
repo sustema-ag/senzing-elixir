@@ -459,6 +459,78 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
+  pub fn find_path_by_entity_id(env: beam.env, startEntityId: c_longlong, endEntityId: c_longlong, maxDegree: c_longlong, flags: c_longlong, exclude: ?[]u8, includedDataSources: ?[]u8) !beam.term {
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    var success: c_longlong = -3;
+
+    if(includedDataSources) |dataSources| {
+      var g2_include = try beam.allocator.dupeZ(u8, dataSources);
+      var g2_excluded = if (exclude) |excluded| try beam.allocator.dupeZ(u8, excluded) else try beam.allocator.dupeZ(u8, "{\"RECORDS\":[]}");
+
+      success = G2.G2_findPathIncludingSourceByEntityID_V2(startEntityId, endEntityId, maxDegree, g2_excluded, g2_include, flags, &responseBuf, &responseBufSize, resize_pointer);
+    } else if (exclude) |excludeIds| {
+      var g2_exclude = try beam.allocator.dupeZ(u8, excludeIds);
+      success = G2.G2_findPathExcludingByEntityID_V2(startEntityId, endEntityId, maxDegree, g2_exclude, flags, &responseBuf, &responseBufSize, resize_pointer);
+    } else {
+      success = G2.G2_findPathByEntityID_V2(startEntityId, endEntityId, maxDegree, flags, &responseBuf, &responseBufSize, resize_pointer);
+    }
+
+    if (success != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn find_path_by_record_id(env: beam.env, startRecordId: []u8, startRecordDataSource: []u8, endRecordId: []u8, endRecordDataSource: []u8, maxDegree: c_longlong, flags: c_longlong, exclude: ?[]u8, includedDataSources: ?[]u8) !beam.term {
+    var g2_startRecordId = try beam.allocator.dupeZ(u8, startRecordId);
+    var g2_startRecordDataSource = try beam.allocator.dupeZ(u8, startRecordDataSource);
+    var g2_endRecordId = try beam.allocator.dupeZ(u8, endRecordId);
+    var g2_endRecordDataSource = try beam.allocator.dupeZ(u8, endRecordDataSource);
+
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    var success: c_longlong = -3;
+
+    if(includedDataSources) |dataSources| {
+      var g2_include = try beam.allocator.dupeZ(u8, dataSources);
+      var g2_excluded = if (exclude) |excluded| try beam.allocator.dupeZ(u8, excluded) else try beam.allocator.dupeZ(u8, "{\"RECORDS\":[]}");
+
+      success = G2.G2_findPathIncludingSourceByRecordID_V2(g2_startRecordDataSource, g2_startRecordId, g2_endRecordDataSource, g2_endRecordId, maxDegree, g2_excluded, g2_include, flags, &responseBuf, &responseBufSize, resize_pointer);
+    } else if (exclude) |excludeIds| {
+      var g2_exclude = try beam.allocator.dupeZ(u8, excludeIds);
+      success = G2.G2_findPathExcludingByRecordID_V2(g2_startRecordDataSource, g2_startRecordId, g2_endRecordDataSource, g2_endRecordId, maxDegree, g2_exclude, flags, &responseBuf, &responseBufSize, resize_pointer);
+    } else {
+      success = G2.G2_findPathByRecordID_V2(g2_startRecordDataSource, g2_startRecordId, g2_endRecordDataSource, g2_endRecordId, maxDegree, flags, &responseBuf, &responseBufSize, resize_pointer);
+    }
+
+    if (success != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn purge_repository(env: beam.env) !beam.term {
+    if (G2.G2_purgeRepository() != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .@"ok", .{});
+  }
+
   pub fn destroy(env: beam.env) !beam.term {
     if(G2.G2_destroy() != 0) {
       var reason = try get_and_clear_last_exception(env);

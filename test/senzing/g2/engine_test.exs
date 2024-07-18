@@ -17,6 +17,12 @@ defmodule Senzing.G2.EngineTest do
     :ok
   end
 
+  setup do
+    :ok = Engine.purge_repository()
+
+    :ok
+  end
+
   test "works" do
   end
 
@@ -316,6 +322,170 @@ defmodule Senzing.G2.EngineTest do
 
       assert {:ok, %{"RESOLVED_ENTITIES" => [%{"ENTITY" => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => ^entity_id}}}]}} =
                Engine.search_by_attributes(%{"PRIMARY_NAME_ORG" => id})
+    end
+  end
+
+  describe inspect(&Engine.find_path_by_entity_id/4) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"
+      id_three = "#{inspect(__MODULE__)}.#{inspect(test)}_three"
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one,
+                   "REL_ANCHOR_DOMAIN" => "TEST",
+                   "REL_ANCHOR_KEY" => "one",
+                   "REL_POINTER_DOMAIN" => "TEST",
+                   "REL_POINTER_KEY" => "two",
+                   "REL_POINTER_ROLE" => "subsidiary"
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Europe",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_two,
+                   "REL_ANCHOR_DOMAIN" => "TEST",
+                   "REL_ANCHOR_KEY" => "two",
+                   "REL_POINTER_DOMAIN" => "TEST",
+                   "REL_POINTER_KEY" => "three",
+                   "REL_POINTER_ROLE" => "subsidiary"
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_three,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Germany",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_three,
+                   "REL_ANCHOR_DOMAIN" => "TEST",
+                   "REL_ANCHOR_KEY" => "three"
+                 },
+                 "TEST"
+               )
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_one}}} =
+               Engine.get_entity_by_record_id(id_one, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_two}}} =
+               Engine.get_entity_by_record_id(id_two, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_three}}} =
+               Engine.get_entity_by_record_id(id_three, "TEST")
+
+      assert {:ok,
+              %{
+                "ENTITY_PATHS" => [
+                  %{
+                    "END_ENTITY_ID" => ^entity_id_three,
+                    "ENTITIES" => [^entity_id_one, ^entity_id_two, ^entity_id_three],
+                    "START_ENTITY_ID" => ^entity_id_one
+                  }
+                ]
+              }} = Engine.find_path_by_entity_id(entity_id_one, entity_id_three, 3)
+
+      assert {:ok, %{"ENTITY_PATHS" => [%{"ENTITIES" => []}]}} =
+               Engine.find_path_by_entity_id(entity_id_one, entity_id_three, 3,
+                 exclude: [entity_id_two],
+                 included_data_sources: ["TEST"]
+               )
+    end
+  end
+
+  describe inspect(&Engine.find_path_by_record_id/4) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"
+      id_three = "#{inspect(__MODULE__)}.#{inspect(test)}_three"
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one,
+                   "REL_ANCHOR_DOMAIN" => "TEST",
+                   "REL_ANCHOR_KEY" => "one",
+                   "REL_POINTER_DOMAIN" => "TEST",
+                   "REL_POINTER_KEY" => "two",
+                   "REL_POINTER_ROLE" => "subsidiary"
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Europe",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_two,
+                   "REL_ANCHOR_DOMAIN" => "TEST",
+                   "REL_ANCHOR_KEY" => "two",
+                   "REL_POINTER_DOMAIN" => "TEST",
+                   "REL_POINTER_KEY" => "three",
+                   "REL_POINTER_ROLE" => "subsidiary"
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_three,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Germany",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_three,
+                   "REL_ANCHOR_DOMAIN" => "TEST",
+                   "REL_ANCHOR_KEY" => "three"
+                 },
+                 "TEST"
+               )
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_one}}} =
+               Engine.get_entity_by_record_id(id_one, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_two}}} =
+               Engine.get_entity_by_record_id(id_two, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_three}}} =
+               Engine.get_entity_by_record_id(id_three, "TEST")
+
+      assert {:ok,
+              %{
+                "ENTITY_PATHS" => [
+                  %{
+                    "END_ENTITY_ID" => ^entity_id_three,
+                    "ENTITIES" => [^entity_id_one, ^entity_id_two, ^entity_id_three],
+                    "START_ENTITY_ID" => ^entity_id_one
+                  }
+                ]
+              }} = Engine.find_path_by_record_id({id_one, "TEST"}, {id_three, "TEST"}, 3)
+
+      assert {:ok, %{"ENTITY_PATHS" => [%{"ENTITIES" => []}]}} =
+               Engine.find_path_by_record_id({id_one, "TEST"}, {id_three, "TEST"}, 3,
+                 exclude: [{id_two, "TEST"}],
+                 included_data_sources: ["TEST"]
+               )
     end
   end
 end
