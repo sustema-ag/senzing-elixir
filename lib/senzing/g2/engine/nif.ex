@@ -441,6 +441,24 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
+  pub fn search_by_attributes(env: beam.env, attributes: []u8, searchProfile: []u8, flags: c_longlong) !beam.term {
+    var g2_attributes = try beam.allocator.dupeZ(u8, attributes);
+    var g2_searchProfile = try beam.allocator.dupeZ(u8, searchProfile);
+
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_searchByAttributes_V3(g2_attributes, g2_searchProfile, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
   pub fn destroy(env: beam.env) !beam.term {
     if(G2.G2_destroy() != 0) {
       var reason = try get_and_clear_last_exception(env);

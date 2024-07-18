@@ -614,6 +614,37 @@ defmodule Senzing.G2.Engine do
          do: {:ok, :json.decode(response)}
   end
 
+  @doc """
+  This method searches for entities that contain attribute information that are
+  relevant to a set of input search attributes.
+
+  See https://docs.senzing.com/python/3/g2engine/searching/index.html#searchbyattributesv3
+
+  ## Examples
+
+      iex> {:ok, _entities} = Senzing.G2.Engine.search_by_attributes(%{"NAME" => "APPLE"})
+      ...> # entities => {:ok, %{"RESOLVED_ENTITIES" => [
+      ...> #   %{"ENTITY" => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => ^entity_id}}}
+      ...> # ]}}
+
+  """
+  @doc type: :searching_for_entities
+  @spec search_by_attributes(
+          attributes :: map(),
+          opts :: [flags: flag() | [flag()], search_profile: String.t()]
+        ) :: G2.result([entity()])
+  def search_by_attributes(attributes, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :search_by_attributes_default_flags)
+
+    with {:ok, response} <-
+           Nif.search_by_attributes(
+             IO.iodata_to_binary(:json.encode(attributes)),
+             opts[:search_profile] || "SEARCH",
+             flags
+           ),
+         do: {:ok, :json.decode(response)}
+  end
+
   # This method will destroy and perform cleanup for the G2 processing object.
   #
   # It should be called after all other calls are complete.
