@@ -208,6 +208,80 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .ok, .{});
   }
 
+  pub fn reevaluate_record(env: beam.env, dataSource: []u8, recordId: []u8, returnInfo: bool) !beam.term {
+    var g2_dataSource = try beam.allocator.dupeZ(u8, dataSource);
+    var g2_recordId = try beam.allocator.dupeZ(u8, recordId);
+    var g2_flags: c_longlong = 0; // Reserved for future use, not currently used
+
+    if (returnInfo) {
+      var responseBuf: [*c]u8 = null;
+      var responseBufSize: usize = 1024;
+      var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+      defer beam.allocator.free(initialResponseBuf);
+      responseBuf = initialResponseBuf.ptr;
+
+      if (G2.G2_reevaluateRecordWithInfo(g2_dataSource, g2_recordId, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+        var reason = try get_and_clear_last_exception(env);
+        return beam.make_error_pair(env, reason, .{});
+      }
+
+      return beam.make(env, .{ .ok, responseBuf }, .{});
+    } else {
+      if (G2.G2_reevaluateRecord(g2_dataSource, g2_recordId, g2_flags) != 0) {
+        var reason = try get_and_clear_last_exception(env);
+        return beam.make_error_pair(env, reason, .{});
+      }
+
+      return beam.make(env, .ok, .{});
+    }
+  }
+
+  pub fn reevaluate_entity(env: beam.env, entityId: c_longlong, returnInfo: bool) !beam.term {
+    var g2_flags: c_longlong = 0; // Reserved for future use, not currently used
+
+    if (returnInfo) {
+      var responseBuf: [*c]u8 = null;
+      var responseBufSize: usize = 1024;
+      var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+      defer beam.allocator.free(initialResponseBuf);
+      responseBuf = initialResponseBuf.ptr;
+
+      if (G2.G2_reevaluateEntityWithInfo(entityId, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+        var reason = try get_and_clear_last_exception(env);
+        return beam.make_error_pair(env, reason, .{});
+      }
+
+      return beam.make(env, .{ .ok, responseBuf }, .{});
+    } else {
+      if (G2.G2_reevaluateEntity(entityId, g2_flags) != 0) {
+        var reason = try get_and_clear_last_exception(env);
+        return beam.make_error_pair(env, reason, .{});
+      }
+
+      return beam.make(env, .ok, .{});
+    }
+  }
+
+  // TODO: Complete
+  pub fn get_entity_by_record_id(env: beam.env, dataSource: []u8, recordId: []u8) !beam.term {
+    var g2_dataSource = try beam.allocator.dupeZ(u8, dataSource);
+    var g2_recordId = try beam.allocator.dupeZ(u8, recordId);
+    var g2_flags: c_longlong = 0; // TODO: Implement
+
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_getEntityByRecordID_V2(g2_dataSource, g2_recordId, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
   pub fn destroy(env: beam.env) !beam.term {
     if(G2.G2_destroy() != 0) {
       var reason = try get_and_clear_last_exception(env);

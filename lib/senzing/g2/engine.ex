@@ -66,6 +66,7 @@ defmodule Senzing.G2.Engine do
   ```
   """
   @type record() :: map()
+  @type record_id() :: String.t()
   @type data_source() :: String.t()
 
   # This method will initialize the G2 processing object.
@@ -224,8 +225,8 @@ defmodule Senzing.G2.Engine do
   @spec add_record(
           record :: record(),
           data_source :: data_source(),
-          opts :: [load_id: String.t(), return_info: boolean(), return_record_id: boolean(), record_id: String.t()]
-        ) :: G2.result({record_id :: String.t() | nil, info :: record() | nil}) | G2.result()
+          opts :: [load_id: String.t(), return_info: boolean(), return_record_id: boolean(), record_id: record_id()]
+        ) :: G2.result({record_id :: record_id() | nil, info :: record() | nil}) | G2.result()
   def add_record(record, data_source, opts \\ []) do
     with {:ok, {record_id, info}} <-
            Nif.add_record(
@@ -273,7 +274,7 @@ defmodule Senzing.G2.Engine do
   @doc type: :add_records
   @spec replace_record(
           record :: record(),
-          record_id :: String.t(),
+          record_id :: record_id(),
           data_source :: data_source(),
           opts :: [load_id: String.t(), return_info: boolean()]
         ) :: G2.result()
@@ -288,6 +289,37 @@ defmodule Senzing.G2.Engine do
            ) do
       {:ok, :json.decode(info)}
     end
+  end
+
+  @doc """
+  Reevaluate a record in the database.
+
+  See https://docs.senzing.com/python/3/g2engine/reevaluating/index.html#reevaluaterecord
+
+  ## Examples
+
+      iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
+      iex> {:ok, _info} = Senzing.G2.Engine.reevaluate_record("test id", "TEST", return_info: true)
+      iex> # info => %{
+      iex> #   "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
+      iex> #   "DATA_SOURCE" => "TEST",
+      iex> #   "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+      iex> #   "RECORD_ID" => "test id"
+      iex> # }
+  """
+  @doc type: :reevaluating
+  @spec reevaluate_record(record_id :: record_id(), data_source :: data_source(), opts :: [return_info: boolean()]) ::
+          G2.result() | G2.result(map())
+  def reevaluate_record(record_id, data_source, opts \\ []) do
+    with {:ok, response} <- Nif.reevaluate_record(data_source, record_id, opts[:return_info] || false),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc type: :reevaluating
+  @spec reevaluate_entity(entity_id :: integer(), opts :: [return_info: boolean()]) :: G2.result() | G2.result(map())
+  def reevaluate_entity(entity_id, opts \\ []) do
+    with {:ok, response} <- Nif.reevaluate_entity(entity_id, opts[:return_info] || false),
+         do: {:ok, :json.decode(response)}
   end
 
   # This method will destroy and perform cleanup for the G2 processing object.
