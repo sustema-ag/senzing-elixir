@@ -67,6 +67,9 @@ defmodule Senzing.G2.Engine do
   """
   @type record() :: map()
   @type record_id() :: String.t()
+
+  @type redo_record() :: map()
+
   @type data_source() :: String.t()
 
   # This method will initialize the G2 processing object.
@@ -306,6 +309,7 @@ defmodule Senzing.G2.Engine do
       iex> #   "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
       iex> #   "RECORD_ID" => "test id"
       iex> # }
+
   """
   @doc type: :reevaluating
   @spec reevaluate_record(record_id :: record_id(), data_source :: data_source(), opts :: [return_info: boolean()]) ::
@@ -315,11 +319,107 @@ defmodule Senzing.G2.Engine do
          do: {:ok, :json.decode(response)}
   end
 
+  @doc """
+  Reevaluate an entity in the database.
+
+  See https://docs.senzing.com/python/3/g2engine/reevaluating/index.html#reevaluateentity
+
+  ## Examples
+
+      iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
+      iex> # TODO: Use finished fn
+      iex> {:ok, json} = Senzing.G2.Engine.Nif.get_entity_by_record_id("TEST", "test id")
+      iex> %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}} = :json.decode(json)
+      iex> :ok = Senzing.G2.Engine.reevaluate_entity(entity_id)
+      iex> {:ok, %{"AFFECTED_ENTITIES" => [%{"ENTITY_ID" => ^entity_id}]}} =
+      ...>   Senzing.G2.Engine.reevaluate_entity(entity_id, return_info: true)
+
+  """
   @doc type: :reevaluating
   @spec reevaluate_entity(entity_id :: integer(), opts :: [return_info: boolean()]) :: G2.result() | G2.result(map())
   def reevaluate_entity(entity_id, opts \\ []) do
     with {:ok, response} <- Nif.reevaluate_entity(entity_id, opts[:return_info] || false),
          do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  Get the number of records contained in the internal redo-queue.
+
+  See https://docs.senzing.com/python/3/g2engine/redo/index.html#countredorecords
+
+  ## Examples
+
+      iex> {:ok, _count} = Senzing.G2.Engine.count_redo_records()
+      iex> # count => 0
+  """
+  @doc type: :redo_processing
+  @spec count_redo_records :: G2.result(integer())
+  defdelegate count_redo_records, to: Nif
+
+  @doc """
+  Retrieve a record contained in the internal redo-queue.
+
+  See https://docs.senzing.com/python/3/g2engine/redo/index.html#getredorecord
+
+  ## Examples
+
+      iex> {:ok, record} = Senzing.G2.Engine.get_redo_record()
+      iex> is_map(record) or is_nil(record)
+      true
+
+  """
+  @doc type: :redo_processing
+  @spec get_redo_record :: G2.result(redo_record() | nil)
+  def get_redo_record do
+    case Nif.get_redo_record() do
+      {:ok, ""} -> {:ok, nil}
+      {:ok, record} -> {:ok, :json.decode(record)}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  @doc """
+  This method will send a record for processing in g2.
+
+  It is a synchronous call, i.e. it will wait until g2 actually processes the
+  record, and then return any response message.
+
+  See https://docs.senzing.com/python/3/g2engine/redo/index.html#process
+
+  ## Examples
+
+      iex> # TODO
+
+  """
+  @doc type: :redo_processing
+  @spec process_redo_record(record :: redo_record(), opts :: [return_info: boolean()]) :: G2.result(map() | nil)
+  def process_redo_record(record, opts \\ []) do
+    with {:ok, info} <- Nif.process_redo_record(IO.iodata_to_binary(:json.encode(record)), opts[:return_info] || false),
+         do: {:ok, :json.decode(info)}
+  end
+
+  @doc """
+  Process a record contained in the internal redo-queue.
+
+  See https://docs.senzing.com/python/3/g2engine/redo/index.html#processredorecord
+
+  ## Examples
+
+      iex> {:ok, nil} = Senzing.G2.Engine.process_next_redo_record(return_info: true)
+
+  """
+  @doc type: :redo_processing
+  @spec process_next_redo_record(opts :: [return_info: boolean()]) :: G2.result({map(), map()} | map() | nil)
+  def process_next_redo_record(opts \\ []) do
+    return_info = opts[:return_info] || false
+
+    case Nif.process_next_redo_record(return_info) do
+      {:ok, {"", ""}} when return_info -> {:ok, nil}
+      {:ok, ""} when not return_info -> {:ok, nil}
+      {:ok, {response, info}} when return_info -> {:ok, {:json.decode(response), :json.decode(info)}}
+      {:ok, response} when not return_info -> {:ok, :json.decode(response)}
+      {:error, reason} -> {:error, reason}
+    end
   end
 
   # This method will destroy and perform cleanup for the G2 processing object.

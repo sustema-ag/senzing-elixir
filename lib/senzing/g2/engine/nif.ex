@@ -262,6 +262,87 @@ defmodule Senzing.G2.Engine.Nif do
     }
   }
 
+  pub fn count_redo_records(env: beam.env) !beam.term {
+    const redoRecordCount = G2.G2_countRedoRecords();
+
+    return beam.make(env, .{ .ok, redoRecordCount }, .{});
+  }
+
+  pub fn get_redo_record(env: beam.env) !beam.term {
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_getRedoRecord(&responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn process_redo_record(env: beam.env, record: []u8, returnInfo: bool) !beam.term {
+    var g2_record = try beam.allocator.dupeZ(u8, record);
+
+    if (returnInfo) {
+      var g2_flags: c_longlong = 0; // Reserved for future use, not currently used
+
+      var responseBuf: [*c]u8 = null;
+      var responseBufSize: usize = 1024;
+      var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+      defer beam.allocator.free(initialResponseBuf);
+      responseBuf = initialResponseBuf.ptr;
+
+      if (G2.G2_processWithInfo(g2_record, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+        var reason = try get_and_clear_last_exception(env);
+        return beam.make_error_pair(env, reason, .{});
+      }
+
+      return beam.make(env, .{ .ok, responseBuf }, .{});
+    }
+
+    if (G2.G2_process(g2_record) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .ok, .{});
+  }
+
+  pub fn process_next_redo_record(env: beam.env, returnInfo: bool) !beam.term {
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if(returnInfo) {
+      var g2_flags: c_longlong = 0; // Reserved for future use, not currently used
+
+      var infoBuf: [*c]u8 = null;
+      var infoBufSize: usize = 1024;
+      var initialInfoBuf = try beam.allocator.alloc(u8, infoBufSize);
+      defer beam.allocator.free(initialInfoBuf);
+      infoBuf = initialInfoBuf.ptr;
+
+      if (G2.G2_processRedoRecordWithInfo(g2_flags, &responseBuf, &responseBufSize, &infoBuf, &infoBufSize, resize_pointer) != 0) {
+        var reason = try get_and_clear_last_exception(env);
+        return beam.make_error_pair(env, reason, .{});
+      }
+
+      return beam.make(env, .{ .ok, .{ responseBuf, infoBuf } }, .{});
+    }
+
+    if (G2.G2_processRedoRecord(&responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
   // TODO: Complete
   pub fn get_entity_by_record_id(env: beam.env, dataSource: []u8, recordId: []u8) !beam.term {
     var g2_dataSource = try beam.allocator.dupeZ(u8, dataSource);
