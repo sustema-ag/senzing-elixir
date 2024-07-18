@@ -300,4 +300,22 @@ defmodule Senzing.G2.EngineTest do
                Engine.get_virtual_entity([{id_one, "TEST"}, {id_two, "TEST"}])
     end
   end
+
+  describe inspect(&Engine.search_by_attributes/2) do
+    test "works", %{test: test} do
+      id = "#{inspect(__MODULE__)}.#{inspect(test)}"
+
+      assert :ok =
+               Engine.add_record(
+                 %{"RECORD_ID" => id, "RECORD_TYPE" => "ORGANIZATION", "PRIMARY_NAME_ORG" => id},
+                 "TEST"
+               )
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
+               Engine.get_entity_by_record_id(id, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITIES" => [%{"ENTITY" => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => ^entity_id}}}]}} =
+               Engine.search_by_attributes(%{"PRIMARY_NAME_ORG" => id})
+    end
+  end
 end
