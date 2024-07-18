@@ -68,6 +68,9 @@ defmodule Senzing.G2.Engine do
   @type record() :: map()
   @type record_id() :: String.t()
 
+  @type entity() :: map()
+  @type entity_id() :: pos_integer()
+
   @type redo_record() :: map()
 
   @type data_source() :: String.t()
@@ -444,6 +447,90 @@ defmodule Senzing.G2.Engine do
         ) :: G2.result() | G2.result(map())
   def delete_record(record_id, data_source, opts \\ []) do
     with {:ok, response} <- Nif.delete_record(data_source, record_id, opts[:load_id], opts[:with_info] || false),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method is used to retrieve a stored record.
+
+  See https://docs.senzing.com/python/3/g2engine/getting/index.html#getrecord
+
+  ## Examples
+
+      iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
+      iex> {:ok, _record} = Senzing.G2.Engine.get_record("test id", "TEST")
+      iex> # record => %{"RECORD_ID" => "test id"}
+  """
+  @doc type: :getting_entities_and_records
+  @spec get_record(record_id :: record_id(), data_source :: data_source(), opts :: []) :: G2.result(record())
+  def get_record(record_id, data_source, _opts \\ []) do
+    with {:ok, response} <- Nif.get_record(data_source, record_id),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method is used to retrieve information about a specific resolved entity.
+
+  See https://docs.senzing.com/python/3/g2engine/getting/index.html#getentitybyrecordid
+
+  ## Examples
+
+      iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
+      iex> {:ok, _record} = Senzing.G2.Engine.Nif.get_entity_by_record_id("TEST", "test id")
+      iex> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}}
+
+  """
+  @doc type: :getting_entities_and_records
+  @spec get_entity_by_record_id(record_id :: record_id(), data_source :: data_source(), opts :: []) :: G2.result(entity())
+  def get_entity_by_record_id(record_id, data_source, _opts \\ []) do
+    with {:ok, response} <- Nif.get_entity_by_record_id(data_source, record_id),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method is used to retrieve information about a specific resolved entity.
+
+  See: https://docs.senzing.com/python/3/g2engine/getting/index.html#getentitybyentityid
+
+  ## Examples
+
+      iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
+      iex> {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
+      ...>   Senzing.G2.Engine.get_entity_by_record_id("test id", "TEST")
+      iex> {:ok, _record} = Senzing.G2.Engine.get_entity(entity_id)
+      iex> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 7}}
+
+  """
+  @doc type: :getting_entities_and_records
+  @spec get_entity(entity_id :: entity_id(), opts :: []) :: G2.result(entity())
+  def get_entity(entity_id, _opts \\ []) do
+    with {:ok, response} <- Nif.get_entity(entity_id),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method gives information on how an entity composed of a given set of records would look.
+
+  See https://docs.senzing.com/python/3/g2engine/getting/index.html#getvirtualentitybyrecordid
+
+  ## Examples
+
+      iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
+      iex> {:ok, _record} = Senzing.G2.Engine.get_virtual_entity([{"test id", "TEST"}])
+      iex> # record => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}}
+
+  """
+  @doc type: :getting_entities_and_records
+  @spec get_virtual_entity(record_ids :: [{record_id(), data_source()}], opts :: []) :: G2.result(entity())
+  def get_virtual_entity(record_ids, _opts \\ []) do
+    record_ids =
+      record_ids
+      |> Enum.map(fn {id, data_source} -> %{"DATA_SOURCE" => data_source, "RECORD_ID" => id} end)
+      |> then(&%{"RECORDS" => &1})
+      |> :json.encode()
+      |> IO.iodata_to_binary()
+
+    with {:ok, response} <- Nif.get_virtual_entity(record_ids),
          do: {:ok, :json.decode(response)}
   end
 
