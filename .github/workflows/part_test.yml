@@ -40,7 +40,9 @@ jobs:
           version-type: strict
       - uses: actions/cache@v4
         with:
-          path: _build
+          path:  |
+            _build
+            priv/lib
           key: mix_format-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
           restore-keys: |
             mix_format-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
@@ -85,16 +87,15 @@ jobs:
           otp-version: "${{ matrix.otp }}"
           elixir-version: "${{ matrix.elixir }}"
           version-type: strict
-      - name: Install Senzing API
-        uses: senzing-factory/github-action-install-senzing-api@v3
-        with:
-          senzingapi-runtime-version: production-v3
+      - uses: ./.github/actions/setup-senzing-playground
       - uses: goto-bus-stop/setup-zig@v2
         with:
           version: 0.11.0
       - uses: actions/cache@v4
         with:
-          path: _build
+          path:  |
+            _build
+            priv/lib
           key: mix_test-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
           restore-keys: |
             mix_test-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
@@ -127,7 +128,9 @@ jobs:
           version-type: strict
       - uses: actions/cache@v4
         with:
-          path: _build
+          path:  |
+            _build
+            priv/lib
           key: credo-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
           restore-keys: |
             credo-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
@@ -152,16 +155,15 @@ jobs:
         with:
           version-file: .tool-versions
           version-type: strict
-      - name: Install Senzing API
-        uses: senzing-factory/github-action-install-senzing-api@v3
-        with:
-          senzingapi-runtime-version: production-v3
+      - uses: ./.github/actions/setup-senzing-playground
       - uses: goto-bus-stop/setup-zig@v2
         with:
           version: 0.11.0
       - uses: actions/cache@v4
         with:
-          path: _build
+          path:  |
+            _build
+            priv/lib
           key: dialyxir-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
           restore-keys: |
             dialyxir-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-

@@ -58,9 +58,9 @@ You can be up and running in minutes and deploy into production in weeks.
 To be able to run this package, Senzing has to be installed by following the
 Linux setup guide: <https://docs.senzing.com/quickstart/quickstart_api/>
 
-The path used in
-[`G2CreateProject`](https://docs.senzing.com/quickstart/quickstart_api/#create-a-senzing-project)
-has to be set as an environment variable `SENZING_ROOT`.
+Especially make sure to load all environment variables as described in the
+[Configure Environment](https://docs.senzing.com/quickstart/quickstart_api/)
+section.
 
 The package can be installed by adding `senzing` to your list of dependencies
 in `mix.exs`:
