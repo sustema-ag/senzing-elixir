@@ -89,6 +89,7 @@ defmodule Senzing.MixProject do
       {:doctest_formatter, "~> 0.3.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.18", only: :test},
       {:ex_doc, "~> 0.34.0", only: :dev, runtime: false},
+      {:gen_stage, "~> 1.2", optional: true},
       {:makeup_json, "~> 0.1", only: :dev, runtime: false},
       {:styler, "~> 0.11.9", runtime: false, only: :dev},
       {:zigler, "~> 0.11.1"}

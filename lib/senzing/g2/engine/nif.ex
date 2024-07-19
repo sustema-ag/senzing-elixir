@@ -6,7 +6,6 @@ defmodule Senzing.G2.Engine.Nif do
   ~z"""
   const beam = @import("beam");
   const G2 = @cImport(@cInclude("libg2.h"));
-  const std = @import("std");
   const root = @import("root");
 
   pub const ExportResource = beam.Resource(G2.ExportHandle, root, .{});
@@ -249,7 +248,9 @@ defmodule Senzing.G2.Engine.Nif do
       defer beam.allocator.free(initialResponseBuf);
       responseBuf = initialResponseBuf.ptr;
 
-      if (G2.G2_reevaluateEntityWithInfo(entityId, g2_flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var result = G2.G2_reevaluateEntityWithInfo(entityId, g2_flags, &responseBuf, &responseBufSize, resize_pointer);
+
+      if (result != 0) {
         var reason = try get_and_clear_last_exception(env);
         return beam.make_error_pair(env, reason, .{});
       }

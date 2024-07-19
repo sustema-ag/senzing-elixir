@@ -99,6 +99,22 @@ defmodule Senzing.G2.Engine do
 
   @type data_source() :: String.t()
 
+  @typedoc """
+  Info from add / replace / delete record
+
+  ## Example
+
+  ```elixir
+  %{
+    "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
+    "DATA_SOURCE" => "TEST",
+    "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+    "RECORD_ID" => "one"
+  }
+  ```
+  """
+  @type mutation_info() :: map()
+
   # This method will initialize the G2 processing object.
   #
   # It must be called once per process, prior to any other calls.
@@ -263,7 +279,8 @@ defmodule Senzing.G2.Engine do
             return_record_id: boolean(),
             record_id: record_id()
           ]
-        ) :: G2.result({record_id :: record_id() | nil, info :: record() | nil}) | G2.result()
+        ) ::
+          G2.result({record_id :: record_id() | nil, info :: mutation_info() | nil}) | G2.result()
   def add_record(record, data_source, opts \\ []) do
     with {:ok, {record_id, info}} <-
            Nif.add_record(
@@ -316,7 +333,7 @@ defmodule Senzing.G2.Engine do
           record_id :: record_id(),
           data_source :: data_source(),
           opts :: [load_id: String.t(), return_info: boolean()]
-        ) :: G2.result()
+        ) :: G2.result() | G2.result(mutation_info())
   def replace_record(record, record_id, data_source, opts \\ []) do
     with {:ok, info} <-
            Nif.replace_record(
@@ -353,7 +370,7 @@ defmodule Senzing.G2.Engine do
           data_source :: data_source(),
           opts :: [return_info: boolean()]
         ) ::
-          G2.result() | G2.result(map())
+          G2.result() | G2.result(mutation_info())
   def reevaluate_record(record_id, data_source, opts \\ []) do
     with {:ok, response} <-
            Nif.reevaluate_record(data_source, record_id, opts[:return_info] || false),
@@ -380,7 +397,7 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :reevaluating
   @spec reevaluate_entity(entity_id :: integer(), opts :: [return_info: boolean()]) ::
-          G2.result() | G2.result(map())
+          G2.result() | G2.result(mutation_info())
   def reevaluate_entity(entity_id, opts \\ []) do
     with {:ok, response} <- Nif.reevaluate_entity(entity_id, opts[:return_info] || false),
          do: {:ok, :json.decode(response)}
@@ -499,11 +516,11 @@ defmodule Senzing.G2.Engine do
   @spec delete_record(
           record_id :: record_id(),
           data_source :: data_source(),
-          opts :: [with_info: boolean(), load_id: String.t()]
-        ) :: G2.result() | G2.result(map())
+          opts :: [return_info: boolean(), load_id: String.t()]
+        ) :: G2.result() | G2.result(mutation_info())
   def delete_record(record_id, data_source, opts \\ []) do
     with {:ok, response} <-
-           Nif.delete_record(data_source, record_id, opts[:load_id], opts[:with_info] || false),
+           Nif.delete_record(data_source, record_id, opts[:load_id], opts[:return_info] || false),
          do: {:ok, :json.decode(response)}
   end
 
