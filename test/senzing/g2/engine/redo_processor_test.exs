@@ -1,5 +1,5 @@
 defmodule Senzing.G2.Engine.RedoProcessorTest do
-  use Senzing.G2.EngineCase, asnyc: false
+  use Senzing.G2.EngineCase, async: false
 
   alias Senzing.G2.Engine
   alias Senzing.G2.Engine.RedoProcessor

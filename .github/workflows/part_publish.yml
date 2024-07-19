@@ -27,7 +27,9 @@ jobs:
           version-type: strict
       - uses: actions/cache@v4
         with:
-          path: _build
+          path:  |
+            _build
+            priv/lib
           key: mix_hex_publish-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ hashFiles('mix.exs') }}
           restore-keys: |
             mix_hex_publish-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-
@@ -56,7 +58,9 @@ jobs:
           version-type: strict
       - uses: actions/cache@v4
         with:
-          path: _build
+          path:  |
+            _build
+            priv/lib
           key: mix_hex_build-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ hashFiles('mix.exs') }}
           restore-keys: |
             mix_hex_build-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-

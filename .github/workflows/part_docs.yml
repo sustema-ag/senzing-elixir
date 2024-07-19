@@ -20,16 +20,15 @@ jobs:
         with:
           version-file: .tool-versions
           version-type: strict
-      - name: Install Senzing API
-        uses: senzing-factory/github-action-install-senzing-api@v3
-        with:
-          senzingapi-runtime-version: production-v3
+      - uses: ./.github/actions/setup-senzing-playground
       - uses: goto-bus-stop/setup-zig@v2
         with:
           version: 0.11.0
       - uses: actions/cache@v4
         with:
-          path: _build
+          path: |
+            _build
+            priv/lib
           key: docs-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('rebar.config') }}
           restore-keys: |
             docs-build-{{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-

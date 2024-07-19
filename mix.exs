@@ -46,7 +46,7 @@ defmodule Senzing.MixProject do
     [
       maintainers: ["Jonatan Männchen"],
       files: [
-        "lib",
+        "lib/**/*.ex",
         "LICENSE*",
         "mix.exs",
         "README*"
