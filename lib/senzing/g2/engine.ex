@@ -791,6 +791,110 @@ defmodule Senzing.G2.Engine do
   end
 
   @doc """
+  This method is used to find a network of entity relationships, surrounding the
+  paths between a set of entities.
+
+  See https://docs.senzing.com/python/3/g2engine/finding_networks/index.html#finding-networks
+
+  ## Examples
+
+      iex> _result = Senzing.G2.Engine.find_network_by_entity_id([1, 2, 3], max_degree: 3)
+      ...> # result => {:ok, %{
+      ...> #   "ENTITIES" => [
+      ...> #     %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}},
+      ...> #     %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 2}},
+      ...> #     %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 3}}
+      ...> #   ]
+      ...> # }}
+
+  """
+  @doc type: :finding_networks
+  @spec find_network_by_entity_id(
+          entity_ids :: [entity_id()],
+          opts :: [
+            max_degree: pos_integer(),
+            buildout_degree: pos_integer(),
+            max_entities: pos_integer(),
+            flags: flag() | [flag()]
+          ]
+        ) :: G2.result(map())
+  def find_network_by_entity_id(entity_ids, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :find_path_default_flags)
+
+    entity_ids =
+      entity_ids
+      |> Enum.map(&%{"ENTITY_ID" => &1})
+      |> then(&%{"ENTITIES" => &1})
+      |> :json.encode()
+      |> IO.iodata_to_binary()
+
+    with {:ok, response} <-
+           Nif.find_network_by_entity_id(
+             entity_ids,
+             opts[:max_degree] || 3,
+             opts[:buildout_degree] || 10,
+             opts[:max_entities] || 100,
+             flags
+           ),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method is used to find a network of entity relationships, surrounding the
+  paths between a set of records.
+
+  See https://docs.senzing.com/python/3/g2engine/finding_networks/index.html#findnetworkbyrecordid
+
+  ## Examples
+
+      iex> _result =
+      ...>   Senzing.G2.Engine.find_network_by_record_id(
+      ...>     [{"test id 1", "TEST"}, {"test id 2", "TEST"}],
+      ...>     max_degree: 3
+      ...>   )
+      ...> 
+      ...> # result => {:ok, %{
+      ...> #   "ENTITIES" => [
+      ...> #     %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 1}},
+      ...> #     %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => 2}}
+      ...> #   ]
+      ...> # }}
+
+  """
+  @doc type: :finding_networks
+  @spec find_network_by_record_id(
+          record_ids :: [{record_id(), data_source()}],
+          opts :: [
+            max_degree: pos_integer(),
+            buildout_degree: pos_integer(),
+            max_entities: pos_integer(),
+            flags: flag() | [flag()]
+          ]
+        ) :: G2.result(map())
+  def find_network_by_record_id(record_ids, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :find_path_default_flags)
+
+    record_ids =
+      record_ids
+      |> Enum.map(fn {record_id, data_source} ->
+        %{"DATA_SOURCE" => data_source, "RECORD_ID" => record_id}
+      end)
+      |> then(&%{"RECORDS" => &1})
+      |> :json.encode()
+      |> IO.iodata_to_binary()
+
+    with {:ok, response} <-
+           Nif.find_network_by_record_id(
+             record_ids,
+             opts[:max_degree] || 3,
+             opts[:buildout_degree] || 10,
+             opts[:max_entities] || 100,
+             flags
+           ),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
   This is used to purge all data from an existing repository
 
   See https://docs.senzing.com/python/3/g2engine/cleanup/index.html#purgerepository

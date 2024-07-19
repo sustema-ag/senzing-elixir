@@ -522,6 +522,40 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
+  pub fn find_network_by_entity_id(env: beam.env, entityIds: []u8, maxDegree: c_longlong, buildoutDegree: c_longlong, maxEntities: c_longlong, flags: c_longlong) !beam.term {
+    var g2_entityIds = try beam.allocator.dupeZ(u8, entityIds);
+
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_findNetworkByEntityID_V2(g2_entityIds, maxDegree, buildoutDegree, maxEntities, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn find_network_by_record_id(env: beam.env, recordIds: []u8, maxDegree: c_longlong, buildoutDegree: c_longlong, maxEntities: c_longlong, flags: c_longlong) !beam.term {
+    var g2_recordIds = try beam.allocator.dupeZ(u8, recordIds);
+
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_findNetworkByRecordID_V2(g2_recordIds, maxDegree, buildoutDegree, maxEntities, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
   pub fn purge_repository(env: beam.env) !beam.term {
     if (G2.G2_purgeRepository() != 0) {
       var reason = try get_and_clear_last_exception(env);
