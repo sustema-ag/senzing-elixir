@@ -14,7 +14,7 @@ defmodule Senzing.Application do
       end
 
     Supervisor.start_link(
-      children,
+      [Senzing.Telemetry | children],
       strategy: :one_for_one,
       name: Senzing.Supervisor
     )
