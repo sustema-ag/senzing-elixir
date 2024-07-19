@@ -30,3 +30,6 @@ senzing-*.tar
 
 # Env Files
 /.env
+
+# Ignore compiled zigler libs
+/priv/lib
