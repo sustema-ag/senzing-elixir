@@ -636,4 +636,237 @@ defmodule Senzing.G2.EngineTest do
               }} = Engine.find_network_by_record_id([{id_one, "TEST"}])
     end
   end
+
+  describe inspect(&Engine.why_records/3) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple"
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Europe"
+                 },
+                 "TEST"
+               )
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_one}}} =
+               Engine.get_entity_by_record_id(id_one, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_two}}} =
+               Engine.get_entity_by_record_id(id_two, "TEST")
+
+      assert {
+               :ok,
+               %{
+                 "WHY_RESULTS" => [
+                   %{
+                     "ENTITY_ID" => ^entity_id_one,
+                     "ENTITY_ID_2" => ^entity_id_two,
+                     "FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_one}],
+                     "FOCUS_RECORDS_2" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_two}]
+                   }
+                 ]
+               }
+             } = Engine.why_records({id_one, "TEST"}, {id_two, "TEST"})
+    end
+  end
+
+  describe inspect(&Engine.why_entity_by_record_id/3) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Inc.",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
+               Engine.get_entity_by_record_id(id_one, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => ^entity_id}}} =
+               Engine.get_entity_by_record_id(id_two, "TEST")
+
+      assert {
+               :ok,
+               %{
+                 "WHY_RESULTS" => [
+                   %{"FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_one}]},
+                   %{"FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_two}]}
+                 ]
+               }
+             } = Engine.why_entity_by_record_id(id_one, "TEST")
+    end
+  end
+
+  describe inspect(&Engine.why_entity_by_entity_id/2) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Inc.",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
+               Engine.get_entity_by_record_id(id_one, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => ^entity_id}}} =
+               Engine.get_entity_by_record_id(id_two, "TEST")
+
+      assert {
+               :ok,
+               %{
+                 "WHY_RESULTS" => [
+                   %{"FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_one}]},
+                   %{"FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_two}]}
+                 ]
+               }
+             } = Engine.why_entity_by_entity_id(entity_id)
+    end
+  end
+
+  describe inspect(&Egnine.why_entities/3) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple"
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Europe"
+                 },
+                 "TEST"
+               )
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_one}}} =
+               Engine.get_entity_by_record_id(id_one, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id_two}}} =
+               Engine.get_entity_by_record_id(id_two, "TEST")
+
+      assert {:ok, %{"WHY_RESULTS" => [%{"ENTITY_ID" => ^entity_id_one, "ENTITY_ID_2" => ^entity_id_two}]}} =
+               Engine.why_entities(entity_id_one, entity_id_two)
+    end
+  end
+
+  describe inspect(&Engine.how_entity_by_entity_id/2) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two"
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Inc.",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
+               Engine.get_entity_by_record_id(id_one, "TEST")
+
+      assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => ^entity_id}}} =
+               Engine.get_entity_by_record_id(id_two, "TEST")
+
+      assert {
+               :ok,
+               %{
+                 "HOW_RESULTS" => %{
+                   "FINAL_STATE" => %{
+                     "VIRTUAL_ENTITIES" => [
+                       %{
+                         "MEMBER_RECORDS" => [
+                           %{"RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_one}]},
+                           %{"RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_two}]}
+                         ]
+                       }
+                     ]
+                   },
+                   "RESOLUTION_STEPS" => [%{"MATCH_INFO" => %{"MATCH_KEY" => "+NAME+TRUSTED_ID"}}]
+                 }
+               }
+             } = Engine.how_entity_by_entity_id(entity_id)
+    end
+  end
 end
