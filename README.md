@@ -9,7 +9,7 @@
 
 <!-- MDOC -->
 
-Elixir NIF for [Senzing©](https://senzing.com/) Entity Matching.
+Elixir NIF for [Senzing©](https://senzing.com/) Entity Resolution API.
 
 <br clear="left"/>
 
@@ -39,6 +39,19 @@ This library was developed and is provided at no cost by
 and supporting the open-source community.
 
 <br clear="left"/>
+
+## Senzing Entity Resolution API
+
+Senzing software makes it easy and affordable to add advanced entity resolution
+capabilities to your enterprise systems and commercial applications.
+
+The Senzing API provides highly accurate data matching and relationship
+detection to improve analytics, insights and outcomes with no entity resolution
+experts required.
+
+You can be up and running in minutes and deploy into production in weeks.
+
+<https://senzing.com/entity-resolution-buyers-guide/>
 
 ## Installation
 
