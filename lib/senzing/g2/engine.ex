@@ -1096,6 +1096,12 @@ defmodule Senzing.G2.Engine do
   This function returns an export-stream that can be read from to get the export
   data in CSV format.
 
+  > #### Production Use {:.warning}
+  >
+  > This function is not recommended for large systems as it does not scale. It
+  > is recommended larger systems implement real-time replication to a data
+  > warehouse.
+
   See https://docs.senzing.com/python/3/g2engine/reporting/index.html#exportcsventityreport
 
   ## Example
@@ -1142,6 +1148,12 @@ defmodule Senzing.G2.Engine do
 
   This function returns an export-stream that can be read from to get the export
   data in JSON format.
+
+  > #### Production Use {:.warning}
+  >
+  > This function is not recommended for large systems as it does not scale. It
+  > is recommended larger systems implement real-time replication to a data
+  > warehouse.
 
   See https://docs.senzing.com/python/3/g2engine/reporting/index.html#exportjsonentityreport
 
@@ -1190,6 +1202,27 @@ defmodule Senzing.G2.Engine do
   @doc type: :cleanup
   @spec purge_repository() :: G2.result()
   defdelegate purge_repository, to: Nif
+
+  @doc """
+  This method returns a JSON document that provides basic statistics on the requests made through the G2 object.
+
+  It returns things such as the * number of records loaded, the duration of
+  processing time, the number of retries made, etc.
+
+  See https://docs.senzing.com/python/3/g2engine/stats/index.html#stats
+
+  ## Examples
+
+      iex> Senzing.G2.Engine.stats()
+      ...> # {:ok, %{"workload" => %{"addedRecords" => 1, ...}, ...}}
+
+  """
+  @doc type: :statistics
+  @spec stats() :: G2.result(map())
+  def stats do
+    with {:ok, response} <- Nif.stats(),
+         do: {:ok, :json.decode(response)}
+  end
 
   # This method will destroy and perform cleanup for the G2 processing object.
   #
