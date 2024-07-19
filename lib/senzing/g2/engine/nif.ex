@@ -1,7 +1,47 @@
 defmodule Senzing.G2.Engine.Nif do
   @moduledoc false
 
-  use Senzing.Nif, resources: [:ExportResource]
+  use Senzing.Nif,
+    resources: [:ExportResource],
+    nifs: [
+      init: [:dirty_io],
+      init_with_config_id: [:dirty_io],
+      reinit: [:dirty_io],
+      prime: [:dirty_io],
+      get_active_config_id: [:dirty_io],
+      export_config: [:dirty_io],
+      get_repository_last_modified: [:dirty_io],
+      add_record: [:dirty_io],
+      replace_record: [:dirty_io],
+      reevaluate_record: [:dirty_io],
+      reevaluate_entity: [:dirty_io],
+      count_redo_records: [:dirty_io],
+      get_redo_record: [:dirty_io],
+      process_redo_record: [:dirty_io],
+      process_next_redo_record: [:dirty_io],
+      delete_record: [:dirty_io],
+      get_record: [:dirty_io],
+      get_entity_by_record_id: [:dirty_io],
+      get_entity: [:dirty_io],
+      get_virtual_entity: [:dirty_io],
+      search_by_attributes: [:dirty_io],
+      find_path_by_entity_id: [:dirty_io],
+      find_path_by_record_id: [:dirty_io],
+      find_network_by_entity_id: [:dirty_io],
+      find_network_by_record_id: [:dirty_io],
+      why_records: [:dirty_io],
+      why_entity_by_record_id: [:dirty_io],
+      why_entity_by_entity_id: [:dirty_io],
+      why_entities: [:dirty_io],
+      how_entity_by_entity_id: [:dirty_io],
+      export_csv_entity_report: [:dirty_io],
+      export_json_entity_report: [:dirty_io],
+      export_fetch_next: [:dirty_io],
+      export_close: [:dirty_io],
+      purge_repository: [:dirty_io],
+      stats: [:dirty_io],
+      destroy: [:dirty_io]
+    ]
 
   ~z"""
   const beam = @import("beam");

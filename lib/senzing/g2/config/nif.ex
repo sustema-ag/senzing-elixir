@@ -1,7 +1,19 @@
 defmodule Senzing.G2.Config.Nif do
   @moduledoc false
 
-  use Senzing.Nif, resources: [:ConfigResource]
+  use Senzing.Nif,
+    resources: [:ConfigResource],
+    nifs: [
+      init: [:dirty_io],
+      create: [:dirty_io],
+      save: [:dirty_io],
+      load_it: [:dirty_io],
+      list_data_sources: [:dirty_io],
+      add_data_source: [:dirty_io],
+      delete_data_source: [:dirty_io],
+      close: [:dirty_io],
+      destroy: [:dirty_io]
+    ]
 
   ~z"""
   const beam = @import("beam");

@@ -5,18 +5,35 @@ defmodule Senzing.G2.Engine.PublisherTest do
   alias Senzing.G2.Engine.Publisher
   alias Senzing.G2.Error
 
+  @moduletag prime: true
+
   doctest Publisher
 
   test "can act as producer and consumer" do
-    :ok = Engine.add_record(%{"RECORD_ID" => "preexisting"}, "TEST")
+    :ok = Engine.add_record(%{"RECORD_ID" => "preexisting", "PRIMARY_NAME_ORG" => "Apple Inc"}, "TEST")
 
     assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => preexisting_entity_id}}} =
              Engine.get_entity_by_record_id("preexisting", "TEST")
 
     events = [
-      %{action: :add, data_source: "TEST", record: %{"RECORD_ID" => "one"}, correlation: :test},
-      %{action: :add, data_source: "TEST", record_id: "two", record: %{"RECORD_TYPE" => "ORGANISATION"}},
-      %{action: :replace, data_source: "TEST", record_id: "one", record: %{"RECORD_TYPE" => "ORGANISATION"}},
+      %{
+        action: :add,
+        data_source: "TEST",
+        record: %{"RECORD_ID" => "one", "PRIMARY_NAME_ORG" => "Microsoft Inc"},
+        correlation: :test
+      },
+      %{
+        action: :add,
+        data_source: "TEST",
+        record_id: "two",
+        record: %{"RECORD_TYPE" => "ORGANISATION", "PRIMARY_NAME_ORG" => "Uber Inc"}
+      },
+      %{
+        action: :replace,
+        data_source: "TEST",
+        record_id: "one",
+        record: %{"RECORD_TYPE" => "ORGANISATION", "PRIMARY_NAME_ORG" => "Microsoft, Inc."}
+      },
       %{action: :delete, data_source: "TEST", record_id: "two"},
       %{action: :reevaluate_record, data_source: "TEST", record_id: "one"},
       %{action: :reevaluate_entity, entity_id: preexisting_entity_id}
@@ -27,7 +44,10 @@ defmodule Senzing.G2.Engine.PublisherTest do
     {:ok, publisher} =
       Publisher.start_link(
         producer_consumer_options: [subscribe_to: [producer]],
-        produce_change_events: true
+        produce_change_events: true,
+        # Make sure the events arrive in order
+        concurrency: 1,
+        ordered: true
       )
 
     out_events =
@@ -61,7 +81,7 @@ defmodule Senzing.G2.Engine.PublisherTest do
              },
              %{
                mutation: %{
-                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_one}, %{"ENTITY_ID" => entity_id_two}],
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_one}, %{"ENTITY_ID" => entity_id_one_new}],
                  "DATA_SOURCE" => "TEST",
                  "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
                  "RECORD_ID" => "one"
@@ -77,7 +97,7 @@ defmodule Senzing.G2.Engine.PublisherTest do
              },
              %{
                mutation: %{
-                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 2}],
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_one_new}],
                  "DATA_SOURCE" => "TEST",
                  "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
                  "RECORD_ID" => "one"
@@ -85,7 +105,7 @@ defmodule Senzing.G2.Engine.PublisherTest do
              },
              %{
                mutation: %{
-                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => ^preexisting_entity_id}],
                  "DATA_SOURCE" => "TEST",
                  "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
                  "RECORD_ID" => "preexisting"
@@ -96,9 +116,19 @@ defmodule Senzing.G2.Engine.PublisherTest do
 
   test "can act as only consumer" do
     events = [
-      %{action: :add, data_source: "TEST", record: %{"RECORD_ID" => "one"}},
-      %{action: :add, data_source: "TEST", record_id: "two", record: %{"RECORD_TYPE" => "ORGANISATION"}},
-      %{action: :replace, data_source: "TEST", record_id: "one", record: %{"RECORD_TYPE" => "ORGANISATION"}},
+      %{action: :add, data_source: "TEST", record: %{"RECORD_ID" => "one", "PRIMARY_NAME_ORG" => "Microsoft Inc"}},
+      %{
+        action: :add,
+        data_source: "TEST",
+        record_id: "two",
+        record: %{"RECORD_TYPE" => "ORGANISATION", "PRIMARY_NAME_ORG" => "Apple Inc"}
+      },
+      %{
+        action: :replace,
+        data_source: "TEST",
+        record_id: "one",
+        record: %{"RECORD_TYPE" => "ORGANISATION", "PRIMARY_NAME_ORG" => "Microsoft, Inc."}
+      },
       %{action: :delete, data_source: "TEST", record_id: "two"}
     ]
 
@@ -112,7 +142,10 @@ defmodule Senzing.G2.Engine.PublisherTest do
         call_wrapper: fn call ->
           send(pid, :exec)
           call.()
-        end
+        end,
+        # Make sure the events arrive in order
+        concurrency: 1,
+        ordered: true
       )
 
     for _event <- events do
