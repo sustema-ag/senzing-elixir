@@ -223,7 +223,7 @@ defmodule Senzing.G2.EngineTest do
                 "DATA_SOURCE" => "TEST",
                 "INTERESTING_ENTITIES" => %{"ENTITIES" => _entities},
                 "RECORD_ID" => ^id
-              }} = Engine.delete_record(id, "TEST", with_info: true)
+              }} = Engine.delete_record(id, "TEST", return_info: true)
 
       assert {:error, {33, _message}} = Engine.get_entity_by_record_id(id, "TEST")
     end
