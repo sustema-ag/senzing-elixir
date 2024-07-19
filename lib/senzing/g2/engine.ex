@@ -895,6 +895,180 @@ defmodule Senzing.G2.Engine do
   end
 
   @doc """
+  This method determines how records are related to each other.
+
+  See https://docs.senzing.com/python/3/g2engine/why/index.html#whyrecords
+
+  ## Examples
+
+      iex> _result =
+      ...>   Senzing.G2.Engine.why_records(
+      ...>     {"test id 1", "TEST"},
+      ...>     {"test id 2", "TEST"}
+      ...>   )
+      ...> 
+      ...> # result => {
+      ...> #   :ok,
+      ...> #   %{
+      ...> #     "WHY_RESULTS" => [
+      ...> #       %{
+      ...> #         "ENTITY_ID" => ^entity_id_one,
+      ...> #         "ENTITY_ID_2" => ^entity_id_two,
+      ...> #         "FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_one}],
+      ...> #         "FOCUS_RECORDS_2" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id_two}]
+      ...> #       }
+      ...> #     ]
+      ...> #   }
+      ...> # }
+
+  """
+  @doc type: :why
+  @spec why_records(
+          left_record :: {record_id(), data_source()},
+          right_record :: {record_id(), data_source()},
+          opts :: [flags: flag() | [flag()]]
+        ) :: G2.result(map())
+  def why_records(left_record, right_record, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :why_entity_default_flags)
+
+    {left_record_id, left_data_source} = left_record
+    {right_record_id, right_data_source} = right_record
+
+    with {:ok, response} <-
+           Nif.why_records(
+             left_record_id,
+             left_data_source,
+             right_record_id,
+             right_data_source,
+             flags
+           ),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method determines why records are included in the resolved entity they belong to.
+
+  See https://docs.senzing.com/python/3/g2engine/why/index.html#whyentitybyrecordid
+
+  ## Examples
+
+      iex> _result = Senzing.G2.Engine.why_entity_by_record_id("record one", "TEST")
+      ...> # result => {:ok, %{"WHY_RESULTS" => [
+      ...> #   %{"FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => "record one"}]},
+      ...> #   %{"FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => "record two"}]}
+      ...> # ]}}
+
+  """
+  @doc type: :why
+  @spec why_entity_by_record_id(
+          record_id :: record_id(),
+          data_source :: data_source(),
+          opts :: [flags: flag() | [flag()]]
+        ) :: G2.result(map())
+  def why_entity_by_record_id(record_id, data_source, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :why_entity_default_flags)
+
+    with {:ok, response} <-
+           Nif.why_entity_by_record_id(record_id, data_source, flags),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method determines why records are included in the resolved entity they belong to.
+
+  See https://docs.senzing.com/python/3/g2engine/why/index.html#whyentitybyentityid
+
+  ## Examples
+
+      iex> _result = Senzing.G2.Engine.why_entity_by_entity_id(1)
+      ...> # result => {:ok, %{"WHY_RESULTS" => [
+      ...> #   %{"FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => "record one"}]},
+      ...> #   %{"FOCUS_RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => "record two"}]}
+      ...> # ]}}
+
+  """
+  @doc type: :why
+  @spec why_entity_by_entity_id(
+          entity_id :: entity_id(),
+          opts :: [flags: flag() | [flag()]]
+        ) :: G2.result(map())
+  def why_entity_by_entity_id(entity_id, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :why_entity_default_flags)
+
+    with {:ok, response} <-
+           Nif.why_entity_by_entity_id(entity_id, flags),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method determines how entities are related to each other.
+
+  See https://docs.senzing.com/python/3/g2engine/why/index.html#whyentities
+
+  ## Examples
+
+      iex> _result = Senzing.G2.Engine.why_entities(1, 2)
+      ...> # result => {:ok, %{"WHY_RESULTS" => [
+      ...> #   %{"ENTITY_ID" => 1, "ENTITY_ID_2" => 2}
+      ...> # ]}}
+
+  """
+  @doc type: :why
+  @spec why_entities(
+          left_entity_id :: entity_id(),
+          right_entity_id :: entity_id(),
+          opts :: [flags: flag() | [flag()]]
+        ) :: G2.result(map())
+  def why_entities(left_entity_id, right_entity_id, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :why_entity_default_flags)
+
+    with {:ok, response} <-
+           Nif.why_entities(left_entity_id, right_entity_id, flags),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
+  This method gives information on how entities were constructed from their base records.
+
+  See https://docs.senzing.com/python/3/g2engine/how/index.html#howentitybyentityid
+
+  ## Examples
+
+      iex> _result = Senzing.G2.Engine.how_entity_by_entity_id(1)
+      ...> # result => {
+      ...> #   :ok,
+      ...> #   %{
+      ...> #     "HOW_RESULTS" => %{
+      ...> #       "FINAL_STATE" => %{
+      ...> #         "VIRTUAL_ENTITIES" => [
+      ...> #           %{
+      ...> #             "MEMBER_RECORDS" => [
+      ...> #               %{"RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => "record one"}]},
+      ...> #               %{"RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => "record two}]}
+      ...> #             ]
+      ...> #           }
+      ...> #         ]
+      ...> #       },
+      ...> #       "RESOLUTION_STEPS" => [%{"MATCH_INFO" => %{"MATCH_KEY" => "+NAME+TRUSTED_ID"}}]
+      ...> #     }
+      ...> #   }
+      ...> # }
+
+  """
+  @doc type: :how
+  @spec how_entity_by_entity_id(
+          entity_id :: entity_id(),
+          opts :: [flags: flag() | [flag()]]
+        ) :: G2.result(map())
+  def how_entity_by_entity_id(entity_id, opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :how_entity_default_flags)
+
+    with {:ok, response} <-
+           Nif.how_entity_by_entity_id(entity_id, flags),
+         do: {:ok, :json.decode(response)}
+  end
+
+  @doc """
   This is used to purge all data from an existing repository
 
   See https://docs.senzing.com/python/3/g2engine/cleanup/index.html#purgerepository

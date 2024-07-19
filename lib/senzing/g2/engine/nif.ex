@@ -556,6 +556,89 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .{ .ok, responseBuf }, .{});
   }
 
+  pub fn why_records(env: beam.env, leftRecordId: []u8, leftDataSource: []u8, rightRecordId: []u8, rightDataSource: []u8, flags: c_longlong) !beam.term {
+    var g2_leftRecordId = try beam.allocator.dupeZ(u8, leftRecordId);
+    var g2_leftDataSource = try beam.allocator.dupeZ(u8, leftDataSource);
+    var g2_rightRecordId = try beam.allocator.dupeZ(u8, rightRecordId);
+    var g2_rightDataSource = try beam.allocator.dupeZ(u8, rightDataSource);
+
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_whyRecords_V2(g2_leftDataSource, g2_leftRecordId, g2_rightDataSource, g2_rightRecordId, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn why_entity_by_record_id(env: beam.env, recordId: []u8, dataSource: []u8, flags: c_longlong) !beam.term {
+    var g2_recordId = try beam.allocator.dupeZ(u8, recordId);
+    var g2_dataSource = try beam.allocator.dupeZ(u8, dataSource);
+
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_whyEntityByRecordID_V2(g2_dataSource, g2_recordId, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn why_entity_by_entity_id(env: beam.env, entityId: c_longlong, flags: c_longlong) !beam.term {
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_whyEntityByEntityID_V2(entityId, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn why_entities(env: beam.env, leftEntityId: c_longlong, rightEntityId: c_longlong, flags: c_longlong) !beam.term {
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_whyEntities_V2(leftEntityId, rightEntityId, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn how_entity_by_entity_id(env: beam.env, entityId: c_longlong, flags: c_longlong) !beam.term {
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_howEntityByEntityID_V2(entityId, flags, &responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
   pub fn purge_repository(env: beam.env) !beam.term {
     if (G2.G2_purgeRepository() != 0) {
       var reason = try get_and_clear_last_exception(env);
