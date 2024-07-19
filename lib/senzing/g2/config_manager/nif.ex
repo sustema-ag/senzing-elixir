@@ -1,7 +1,17 @@
 defmodule Senzing.G2.ConfigManager.Nif do
   @moduledoc false
 
-  use Senzing.Nif
+  use Senzing.Nif,
+    nifs: [
+      init: [:threaded],
+      destroy: [:threaded],
+      add_config: [:threaded],
+      get_config: [:threaded],
+      list_configs: [:threaded],
+      get_default_config_id: [:threaded],
+      set_default_config_id: [:threaded],
+      replace_default_config_id: [:threaded]
+    ]
 
   ~z"""
   const beam = @import("beam");

@@ -1,7 +1,47 @@
 defmodule Senzing.G2.Engine.Nif do
   @moduledoc false
 
-  use Senzing.Nif, resources: [:ExportResource]
+  use Senzing.Nif,
+    resources: [:ExportResource],
+    nifs: [
+      init: [:threaded],
+      init_with_config_id: [:threaded],
+      reinit: [:threaded],
+      prime: [:threaded],
+      get_active_config_id: [:threaded],
+      export_config: [:threaded],
+      get_repository_last_modified: [:threaded],
+      add_record: [:threaded],
+      replace_record: [:threaded],
+      reevaluate_record: [:threaded],
+      reevaluate_entity: [:threaded],
+      count_redo_records: [:threaded],
+      get_redo_record: [:threaded],
+      process_redo_record: [:threaded],
+      process_next_redo_record: [:threaded],
+      delete_record: [:threaded],
+      get_record: [:threaded],
+      get_entity_by_record_id: [:threaded],
+      get_entity: [:threaded],
+      get_virtual_entity: [:threaded],
+      search_by_attributes: [:threaded],
+      find_path_by_entity_id: [:threaded],
+      find_path_by_record_id: [:threaded],
+      find_network_by_entity_id: [:threaded],
+      find_network_by_record_id: [:threaded],
+      why_records: [:threaded],
+      why_entity_by_record_id: [:threaded],
+      why_entity_by_entity_id: [:threaded],
+      why_entities: [:threaded],
+      how_entity_by_entity_id: [:threaded],
+      export_csv_entity_report: [:threaded],
+      export_json_entity_report: [:threaded],
+      export_fetch_next: [:threaded],
+      export_close: [:threaded],
+      purge_repository: [:threaded],
+      stats: [:threaded],
+      destroy: [:threaded]
+    ]
 
   ~z"""
   const beam = @import("beam");

@@ -1,7 +1,19 @@
 defmodule Senzing.G2.Config.Nif do
   @moduledoc false
 
-  use Senzing.Nif, resources: [:ConfigResource]
+  use Senzing.Nif,
+    resources: [:ConfigResource],
+    nifs: [
+      init: [:threaded],
+      create: [:synchronous],
+      save: [:synchronous],
+      load_it: [:synchronous],
+      list_data_sources: [:synchronous],
+      add_data_source: [:synchronous],
+      delete_data_source: [:synchronous],
+      close: [:synchronous],
+      destroy: [:threaded]
+    ]
 
   ~z"""
   const beam = @import("beam");
