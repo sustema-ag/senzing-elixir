@@ -1068,6 +1068,114 @@ defmodule Senzing.G2.Engine do
          do: {:ok, :json.decode(response)}
   end
 
+  @default_export_csv_entity_report_column_list [
+    "RESOLVED_ENTITY_ID",
+    "RESOLVED_ENTITY_NAME",
+    "RELATED_ENTITY_ID",
+    "MATCH_LEVEL",
+    "MATCH_KEY",
+    "IS_DISCLOSED",
+    "IS_AMBIGUOUS",
+    "DATA_SOURCE",
+    "RECORD_ID",
+    "JSON_DATA",
+    "LAST_SEEN_DT",
+    "NAME_DATA",
+    "ATTRIBUTE_DATA",
+    "IDENTIFIER_DATA",
+    "ADDRESS_DATA",
+    "PHONE_DATA",
+    "RELATIONSHIP_DATA",
+    "ENTITY_DATA",
+    "OTHER_DATA"
+  ]
+
+  @doc """
+  This is used to export entity data from known entities.
+
+  This function returns an export-stream that can be read from to get the export
+  data in CSV format.
+
+  See https://docs.senzing.com/python/3/g2engine/reporting/index.html#exportcsventityreport
+
+  ## Example
+
+      iex> stream = Senzing.G2.Engine.export_csv_entity_report(["RECORD_ID"])
+      ...> Enum.take(stream, 5)
+      ...> # ["RECORD_ID\\n",
+      ...> #  "\\"one\\"\\n",
+      ...> #  "\\"two\\"\\n",
+      ...> #  "\\"three\\"\\n",
+      ...> #  "\\"four\\"\\n"]
+
+  """
+  @doc type: :reporting
+  @spec export_csv_entity_report(column_list :: [String.t()], opts :: [flags: flag() | [flag()]]) ::
+          Enumerable.t(String.t())
+  def export_csv_entity_report(column_list \\ @default_export_csv_entity_report_column_list, opts \\ []) do
+    column_list = Enum.join(column_list, ",")
+
+    flags = Flags.normalize(opts[:flags], :export_default_flags)
+
+    Stream.resource(
+      fn ->
+        case Nif.export_csv_entity_report(column_list, flags) do
+          {:ok, handle} -> handle
+          {:error, reason} -> raise reason
+        end
+      end,
+      fn handle ->
+        case Nif.export_fetch_next(handle) do
+          :eof -> {:halt, handle}
+          {:ok, data} -> {[data], handle}
+          {:error, reason} -> raise reason
+        end
+      end,
+      fn handle ->
+        :ok = Nif.export_close(handle)
+      end
+    )
+  end
+
+  @doc """
+  This is used to export entity data from known entities.
+
+  This function returns an export-stream that can be read from to get the export
+  data in JSON format.
+
+  See https://docs.senzing.com/python/3/g2engine/reporting/index.html#exportjsonentityreport
+
+  ## Example
+
+      iex> stream = Senzing.G2.Engine.export_json_entity_report()
+      ...> Enum.into(stream, "")
+      ...> # "{\\"RESOLVED_ENTITY\\":{\\"ENTITY_ID\\":1}}\\n"
+  """
+  @doc type: :reporting
+  @spec export_json_entity_report(opts :: [flags: flag() | [flag()]]) :: Enumerable.t(map())
+  def export_json_entity_report(opts \\ []) do
+    flags = Flags.normalize(opts[:flags], :export_default_flags)
+
+    Stream.resource(
+      fn ->
+        case Nif.export_json_entity_report(flags) do
+          {:ok, handle} -> handle
+          {:error, reason} -> raise reason
+        end
+      end,
+      fn handle ->
+        case Nif.export_fetch_next(handle) do
+          :eof -> {:halt, handle}
+          {:ok, data} -> {[data], handle}
+          {:error, reason} -> raise reason
+        end
+      end,
+      fn handle ->
+        :ok = Nif.export_close(handle)
+      end
+    )
+  end
+
   @doc """
   This is used to purge all data from an existing repository
 

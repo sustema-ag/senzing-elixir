@@ -869,4 +869,80 @@ defmodule Senzing.G2.EngineTest do
              } = Engine.how_entity_by_entity_id(entity_id)
     end
   end
+
+  describe inspect(&Engine.export_csv_entity_report/1) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one" |> :erlang.crc32() |> Integer.to_string()
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two" |> :erlang.crc32() |> Integer.to_string()
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Inc.",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert csv_stream = Engine.export_csv_entity_report(["RECORD_ID"])
+
+      assert Enum.into(csv_stream, "") == """
+             RECORD_ID
+             #{inspect(id_one)}
+             #{inspect(id_two)}
+             """
+    end
+  end
+
+  describe inspect(&Engine.export_json_entity_report/1) do
+    test "works", %{test: test} do
+      id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one" |> :erlang.crc32() |> Integer.to_string()
+      id_two = "#{inspect(__MODULE__)}.#{inspect(test)}_two" |> :erlang.crc32() |> Integer.to_string()
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_one,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert :ok =
+               Engine.add_record(
+                 %{
+                   "RECORD_ID" => id_two,
+                   "RECORD_TYPE" => "ORGANIZATION",
+                   "PRIMARY_NAME_ORG" => "Apple Inc.",
+                   "TRUSTED_ID_TYPE" => "TEST",
+                   "TRUSTED_ID_NUMBER" => id_one
+                 },
+                 "TEST"
+               )
+
+      assert json_stream = Engine.export_json_entity_report(flags: [:export_include_all_entities])
+
+      assert Enum.into(json_stream, "") == """
+             {"RESOLVED_ENTITY":{"ENTITY_ID":1}}
+             """
+    end
+  end
 end

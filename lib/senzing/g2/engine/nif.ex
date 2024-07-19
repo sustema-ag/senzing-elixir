@@ -1,12 +1,15 @@
 defmodule Senzing.G2.Engine.Nif do
   @moduledoc false
 
-  use Senzing.Nif
+  use Senzing.Nif, resources: [:ExportResource]
 
   ~z"""
   const beam = @import("beam");
   const G2 = @cImport(@cInclude("libg2.h"));
   const std = @import("std");
+  const root = @import("root");
+
+  pub const ExportResource = beam.Resource(G2.ExportHandle, root, .{});
 
   fn get_and_clear_last_exception(env: beam.env) !beam.term {
       var slice = try beam.allocator.alloc(u8, 1024);
@@ -637,6 +640,70 @@ defmodule Senzing.G2.Engine.Nif do
     }
 
     return beam.make(env, .{ .ok, responseBuf }, .{});
+  }
+
+  pub fn export_csv_entity_report(env: beam.env, columnList: []u8, flags: c_longlong) !beam.term {
+    var g2_columnList = try beam.allocator.dupeZ(u8, columnList);
+
+    var handle: G2.ExportHandle = null;
+
+    if(G2.G2_exportCSVEntityReport(g2_columnList, flags, &handle) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    const resource = try ExportResource.create(handle, .{});
+
+    return beam.make(env, .{.@"ok", resource}, .{});
+  }
+
+  pub fn export_json_entity_report(env: beam.env, flags: c_longlong) !beam.term {
+    var handle: G2.ExportHandle = null;
+
+    if(G2.G2_exportJSONEntityReport(flags, &handle) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    const resource = try ExportResource.create(handle, .{});
+
+    return beam.make(env, .{.@"ok", resource}, .{});
+  }
+
+  pub fn export_fetch_next(env: beam.env, exportResource: beam.term) !beam.term {
+    const res = try beam.get(ExportResource, env, exportResource, .{});
+    var handle = res.unpack();
+
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    const result = G2.G2_fetchNext(handle, responseBuf, responseBufSize);
+
+    if(result < 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    } else if(result == 0) {
+      return beam.make(env, .@"eof", .{});
+    }
+
+    return beam.make(env, .{.@"ok", responseBuf}, .{});
+  }
+
+  pub fn export_close(env: beam.env, exportResource: beam.term) !beam.term {
+    const res = try beam.get(ExportResource, env, exportResource, .{});
+    var handle = res.unpack();
+
+    if(G2.G2_closeExport(handle) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    res.update(null);
+
+    return beam.make(env, .@"ok", .{});
   }
 
   pub fn purge_repository(env: beam.env) !beam.term {
