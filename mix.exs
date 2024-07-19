@@ -1,11 +1,14 @@
 defmodule Senzing.MixProject do
   use Mix.Project
 
+  @version "0.0.0-dev"
+
   def project do
     [
       app: :senzing,
-      version: "0.0.0-dev",
+      version: @version,
       elixir: "~> 1.17",
+      elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       docs: &docs/0,
@@ -23,6 +26,10 @@ defmodule Senzing.MixProject do
       ]
     ]
   end
+
+  defp elixirc_paths(env)
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_env), do: ["lib"]
 
   def application do
     [
@@ -50,11 +57,8 @@ defmodule Senzing.MixProject do
   end
 
   defp docs do
-    # TODO: Re-enable
-    # {ref, 0} = System.cmd("git", ["rev-parse", "--verify", "--quiet", "HEAD"])
-
     [
-      # source_ref: ref,
+      source_ref: "v#{@version}",
       main: "Senzing",
       logo: "assets/logo-short.svg",
       assets: %{"assets" => "assets"},

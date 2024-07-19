@@ -1,23 +1,10 @@
 defmodule Senzing.G2.Engine.PublisherTest do
-  use ExUnit.Case, asnyc: false
+  use Senzing.G2.EngineCase, asnyc: false
 
   alias Senzing.G2.Engine
   alias Senzing.G2.Engine.Publisher
-  alias Senzing.G2.ResourceInit
 
   doctest Publisher
-
-  setup_all do
-    start_supervised!({ResourceInit, mod: Engine})
-
-    :ok
-  end
-
-  setup do
-    :ok = Engine.purge_repository()
-
-    :ok
-  end
 
   test "can act as producer and consumer" do
     :ok = Engine.add_record(%{"RECORD_ID" => "preexisting"}, "TEST")
