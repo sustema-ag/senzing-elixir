@@ -715,6 +715,21 @@ defmodule Senzing.G2.Engine.Nif do
     return beam.make(env, .@"ok", .{});
   }
 
+  pub fn stats(env: beam.env) !beam.term {
+    var responseBuf: [*c]u8 = null;
+    var responseBufSize: usize = 1024;
+    var initialResponseBuf = try beam.allocator.alloc(u8, responseBufSize);
+    defer beam.allocator.free(initialResponseBuf);
+    responseBuf = initialResponseBuf.ptr;
+
+    if (G2.G2_stats(&responseBuf, &responseBufSize, resize_pointer) != 0) {
+      var reason = try get_and_clear_last_exception(env);
+      return beam.make_error_pair(env, reason, .{});
+    }
+
+    return beam.make(env, .{.@"ok", responseBuf}, .{});
+  }
+
   pub fn destroy(env: beam.env) !beam.term {
     if(G2.G2_destroy() != 0) {
       var reason = try get_and_clear_last_exception(env);

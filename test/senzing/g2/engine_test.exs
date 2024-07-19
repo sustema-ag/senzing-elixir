@@ -945,4 +945,27 @@ defmodule Senzing.G2.EngineTest do
              """
     end
   end
+
+  describe inspect(&Engine.purge_repository/0) do
+    test "works", %{test: test} do
+      id = "#{inspect(__MODULE__)}.#{inspect(test)}"
+
+      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
+      assert {:ok, _result} = Engine.get_entity_by_record_id(id, "TEST")
+
+      assert :ok = Engine.purge_repository()
+
+      assert {:error, {33, "0033E|Unknown record" <> _}} = Engine.get_entity_by_record_id(id, "TEST")
+    end
+  end
+
+  describe inspect(&Engine.stats/0) do
+    test "works", %{test: test} do
+      id = "#{inspect(__MODULE__)}.#{inspect(test)}"
+
+      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
+
+      assert {:ok, %{"workload" => %{"addedRecords" => 1}}} = Engine.stats()
+    end
+  end
 end
