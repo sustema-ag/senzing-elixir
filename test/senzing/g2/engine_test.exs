@@ -1,5 +1,5 @@
 defmodule Senzing.G2.EngineTest do
-  use ExUnit.Case, async: false
+  use Senzing.G2.EngineCase, async: false
 
   alias Senzing.G2.Config
   alias Senzing.G2.ConfigManager
@@ -12,18 +12,8 @@ defmodule Senzing.G2.EngineTest do
   setup_all do
     start_supervised!({ResourceInit, mod: Config})
     start_supervised!({ResourceInit, mod: ConfigManager})
-    start_supervised!({ResourceInit, mod: Engine})
 
     :ok
-  end
-
-  setup do
-    :ok = Engine.purge_repository()
-
-    :ok
-  end
-
-  test "works" do
   end
 
   describe inspect(&Engine.prime/0) do
@@ -186,24 +176,36 @@ defmodule Senzing.G2.EngineTest do
   end
 
   describe inspect(&Engine.get_redo_record/0) do
+    setup :load_sample_data
+
+    @tag prime: true
+    @tag :slow
     test "works" do
-      assert {:ok, record} = Engine.get_redo_record()
-      assert is_map(record) or is_nil(record)
-      # TODO: How can I trigger a redo so that I can test this properly?
+      assert {:ok, %{"DATA_SOURCE" => "TEST", "DSRC_ACTION" => _}} = Engine.get_redo_record()
     end
   end
 
   describe inspect(&Engine.process_redo_record/2) do
+    setup :load_sample_data
+
+    @tag prime: true
+    @tag :slow
     test "works" do
-      # TODO: How to test?
+      assert {:ok, redo_record} = Engine.get_redo_record()
+      assert :ok = Engine.process_redo_record(redo_record)
     end
   end
 
   describe inspect(&Engine.process_next_redo_record/1) do
+    setup :load_sample_data
+
+    @tag prime: true
+    @tag :slow
     test "works" do
-      # TODO: How to test?
-      assert {:ok, nil} = Engine.process_next_redo_record()
-      assert {:ok, nil} = Engine.process_next_redo_record(return_info: true)
+      assert {:ok, %{"DATA_SOURCE" => "TEST", "DSRC_ACTION" => _}} = Engine.process_next_redo_record()
+
+      assert {:ok, {%{"DATA_SOURCE" => "TEST", "DSRC_ACTION" => _}, %{"AFFECTED_ENTITIES" => _}}} =
+               Engine.process_next_redo_record(return_info: true)
     end
   end
 

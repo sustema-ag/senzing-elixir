@@ -95,6 +95,21 @@ defmodule Senzing.G2.Engine do
   @type entity() :: map()
   @type entity_id() :: pos_integer()
 
+  @typedoc """
+  Redo Record Specification
+
+  ## Example
+
+  ```elixir
+  %{
+    "DATA_SOURCE" => "TEST",
+    "DSRC_ACTION" => "X",
+    "ENTITY_TYPE" => "GENERIC",
+    "REASON" => "LIB_FEAT_ID[132] of FTYPE_ID[75] went generic for CANDIDATES",
+    "RECORD_ID" => "Z2YHHGKOZKXQ72CBID66"
+  }
+  ```
+  """
   @type redo_record() :: map()
 
   @type data_source() :: String.t()
@@ -385,7 +400,7 @@ defmodule Senzing.G2.Engine do
   ## Examples
 
       iex> :ok = Senzing.G2.Engine.add_record(%{"RECORD_ID" => "test id"}, "TEST")
-      ...> # TODO: Use finished fn
+      ...> 
       ...> {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} =
       ...>   Senzing.G2.Engine.get_entity_by_record_id("test id", "TEST")
       ...> 
@@ -449,12 +464,16 @@ defmodule Senzing.G2.Engine do
 
   ## Examples
 
-      iex> # TODO
+      iex> with {:ok, %{} = redo_record} <- Senzing.G2.Engine.get_redo_record(),
+      ...>      {:ok, mutation_info} <- Senzing.G2.Engine.process_redo_record(redo_record) do
+      ...>   # mutation_info => %{"AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}], ...}
+      ...>   {:ok, mutation_info}
+      ...> end
 
   """
   @doc type: :redo_processing
   @spec process_redo_record(record :: redo_record(), opts :: [return_info: boolean()]) ::
-          G2.result(map() | nil)
+          G2.result(mutation_info())
   def process_redo_record(record, opts \\ []) do
     with {:ok, info} <-
            Nif.process_redo_record(
@@ -471,12 +490,18 @@ defmodule Senzing.G2.Engine do
 
   ## Examples
 
-      iex> {:ok, nil} = Senzing.G2.Engine.process_next_redo_record(return_info: true)
+      iex> {:ok, _result} =
+      ...>   Senzing.G2.Engine.process_next_redo_record(return_info: true)
+      ...> 
+      ...> # result => {
+      ...> #   %{"DATA_SOURCE" => "TEST", ...}, # redo_record
+      ...> #   %{"AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}], ...} # mutation_info
+      ...> # }
 
   """
   @doc type: :redo_processing
   @spec process_next_redo_record(opts :: [return_info: boolean()]) ::
-          G2.result({map(), map()} | map() | nil)
+          G2.result({redo_record(), mutation_info()} | map() | nil)
   def process_next_redo_record(opts \\ []) do
     return_info = opts[:return_info] || false
 
