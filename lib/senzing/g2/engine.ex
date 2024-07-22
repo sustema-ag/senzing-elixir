@@ -297,17 +297,34 @@ defmodule Senzing.G2.Engine do
         ) ::
           G2.result({record_id :: record_id() | nil, info :: mutation_info() | nil}) | G2.result()
   def add_record(record, data_source, opts \\ []) do
-    with {:ok, {record_id, info}} <-
-           Nif.add_record(
-             data_source,
-             opts[:record_id],
-             IO.iodata_to_binary(:json.encode(record)),
-             opts[:load_id],
-             opts[:return_record_id] || false,
-             opts[:return_info] || false
-           ) do
-      {:ok, {record_id, if(info, do: :json.decode(info))}}
-    end
+    telemetry_metadata = %{
+      action: :add_record,
+      data_source: data_source,
+      record_id: opts[:record_id],
+      load_id: opts[:load_id]
+    }
+
+    :telemetry.span([:telemetry, :g2, :engine, :write], telemetry_metadata, fn ->
+      data_source
+      |> Nif.add_record(
+        opts[:record_id],
+        IO.iodata_to_binary(:json.encode(record)),
+        opts[:load_id],
+        opts[:return_record_id] || false,
+        opts[:return_info] || false
+      )
+      |> case do
+        :ok ->
+          {:ok, telemetry_metadata}
+
+        {:ok, {record_id, info}} ->
+          {{:ok, {record_id, if(info, do: :json.decode(info))}},
+           %{telemetry_metadata | record_id: record_id || opts[:record_id]}}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -350,16 +367,32 @@ defmodule Senzing.G2.Engine do
           opts :: [load_id: String.t(), return_info: boolean()]
         ) :: G2.result() | G2.result(mutation_info())
   def replace_record(record, record_id, data_source, opts \\ []) do
-    with {:ok, info} <-
-           Nif.replace_record(
-             data_source,
-             record_id,
-             IO.iodata_to_binary(:json.encode(record)),
-             opts[:load_id],
-             opts[:return_info] || false
-           ) do
-      {:ok, :json.decode(info)}
-    end
+    telemetry_metadata = %{
+      action: :replace_record,
+      data_source: data_source,
+      record_id: record_id,
+      load_id: opts[:load_id]
+    }
+
+    :telemetry.span([:telemetry, :g2, :engine, :write], telemetry_metadata, fn ->
+      data_source
+      |> Nif.replace_record(
+        record_id,
+        IO.iodata_to_binary(:json.encode(record)),
+        opts[:load_id],
+        opts[:return_info] || false
+      )
+      |> case do
+        :ok ->
+          {:ok, telemetry_metadata}
+
+        {:ok, info} ->
+          {{:ok, :json.decode(info)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -387,9 +420,26 @@ defmodule Senzing.G2.Engine do
         ) ::
           G2.result() | G2.result(mutation_info())
   def reevaluate_record(record_id, data_source, opts \\ []) do
-    with {:ok, response} <-
-           Nif.reevaluate_record(data_source, record_id, opts[:return_info] || false),
-         do: {:ok, :json.decode(response)}
+    telemetry_metadata = %{
+      action: :reevaluate_record,
+      data_source: data_source,
+      record_id: record_id
+    }
+
+    :telemetry.span([:telemetry, :g2, :engine, :reevaluate], telemetry_metadata, fn ->
+      data_source
+      |> Nif.reevaluate_record(record_id, opts[:return_info] || false)
+      |> case do
+        :ok ->
+          {:ok, telemetry_metadata}
+
+        {:ok, info} ->
+          {{:ok, :json.decode(info)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -414,8 +464,22 @@ defmodule Senzing.G2.Engine do
   @spec reevaluate_entity(entity_id :: integer(), opts :: [return_info: boolean()]) ::
           G2.result() | G2.result(mutation_info())
   def reevaluate_entity(entity_id, opts \\ []) do
-    with {:ok, response} <- Nif.reevaluate_entity(entity_id, opts[:return_info] || false),
-         do: {:ok, :json.decode(response)}
+    telemetry_metadata = %{action: :reevaluate_entity, entity_id: entity_id}
+
+    :telemetry.span([:telemetry, :g2, :engine, :reevaluate], telemetry_metadata, fn ->
+      entity_id
+      |> Nif.reevaluate_entity(opts[:return_info] || false)
+      |> case do
+        :ok ->
+          {:ok, telemetry_metadata}
+
+        {:ok, info} ->
+          {{:ok, :json.decode(info)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -475,12 +539,24 @@ defmodule Senzing.G2.Engine do
   @spec process_redo_record(record :: redo_record(), opts :: [return_info: boolean()]) ::
           G2.result(mutation_info())
   def process_redo_record(record, opts \\ []) do
-    with {:ok, info} <-
-           Nif.process_redo_record(
-             IO.iodata_to_binary(:json.encode(record)),
-             opts[:return_info] || false
-           ),
-         do: {:ok, :json.decode(info)}
+    telemetry_metadata = %{action: :process_redo_record}
+
+    :telemetry.span([:telemetry, :g2, :engine, :process_redo_record], telemetry_metadata, fn ->
+      record
+      |> :json.encode()
+      |> IO.iodata_to_binary()
+      |> Nif.process_redo_record(opts[:return_info] || false)
+      |> case do
+        :ok ->
+          {:ok, telemetry_metadata}
+
+        {:ok, info} ->
+          {{:ok, :json.decode(info)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -503,24 +579,30 @@ defmodule Senzing.G2.Engine do
   @spec process_next_redo_record(opts :: [return_info: boolean()]) ::
           G2.result({redo_record(), mutation_info()} | map() | nil)
   def process_next_redo_record(opts \\ []) do
-    return_info = opts[:return_info] || false
+    telemetry_metadata = %{action: :process_next_redo_record}
 
-    case Nif.process_next_redo_record(return_info) do
-      {:ok, {"", ""}} when return_info ->
-        {:ok, nil}
+    :telemetry.span([:telemetry, :g2, :engine, :process_redo_record], telemetry_metadata, fn ->
+      return_info = opts[:return_info] || false
 
-      {:ok, ""} when not return_info ->
-        {:ok, nil}
+      return_info
+      |> Nif.process_next_redo_record()
+      |> case do
+        {:ok, {"", ""}} when return_info ->
+          {{:ok, nil}, telemetry_metadata}
 
-      {:ok, {response, info}} when return_info ->
-        {:ok, {:json.decode(response), :json.decode(info)}}
+        {:ok, ""} when not return_info ->
+          {{:ok, nil}, telemetry_metadata}
 
-      {:ok, response} when not return_info ->
-        {:ok, :json.decode(response)}
+        {:ok, {response, info}} when return_info ->
+          {{:ok, {:json.decode(response), :json.decode(info)}}, telemetry_metadata}
 
-      {:error, reason} ->
-        {:error, reason}
-    end
+        {:ok, response} when not return_info ->
+          {{:ok, :json.decode(response)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -544,9 +626,27 @@ defmodule Senzing.G2.Engine do
           opts :: [return_info: boolean(), load_id: String.t()]
         ) :: G2.result() | G2.result(mutation_info())
   def delete_record(record_id, data_source, opts \\ []) do
-    with {:ok, response} <-
-           Nif.delete_record(data_source, record_id, opts[:load_id], opts[:return_info] || false),
-         do: {:ok, :json.decode(response)}
+    telemetry_metadata = %{
+      action: :delete_record,
+      data_source: data_source,
+      record_id: record_id,
+      load_id: opts[:load_id]
+    }
+
+    :telemetry.span([:telemetry, :g2, :engine, :write], telemetry_metadata, fn ->
+      data_source
+      |> Nif.delete_record(record_id, opts[:load_id], opts[:return_info] || false)
+      |> case do
+        :ok ->
+          {:ok, telemetry_metadata}
+
+        {:ok, info} ->
+          {{:ok, :json.decode(info)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -568,10 +668,25 @@ defmodule Senzing.G2.Engine do
         ) ::
           G2.result(record())
   def get_record(record_id, data_source, opts \\ []) do
+    telemetry_metadata = %{
+      action: :get_record,
+      data_source: data_source,
+      record_id: record_id
+    }
+
     flags = Flags.normalize(opts[:flags], :record_default_flags)
 
-    with {:ok, response} <- Nif.get_record(data_source, record_id, flags),
-         do: {:ok, :json.decode(response)}
+    :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
+      data_source
+      |> Nif.get_record(record_id, flags)
+      |> case do
+        {:ok, record} ->
+          {{:ok, :json.decode(record)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -593,10 +708,25 @@ defmodule Senzing.G2.Engine do
           opts :: []
         ) :: G2.result(entity())
   def get_entity_by_record_id(record_id, data_source, opts \\ []) do
+    telemetry_metadata = %{
+      action: :get_entity_by_record_id,
+      data_source: data_source,
+      record_id: record_id
+    }
+
     flags = Flags.normalize(opts[:flags], :entity_default_flags)
 
-    with {:ok, response} <- Nif.get_entity_by_record_id(data_source, record_id, flags),
-         do: {:ok, :json.decode(response)}
+    :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
+      data_source
+      |> Nif.get_entity_by_record_id(record_id, flags)
+      |> case do
+        {:ok, entity} ->
+          {{:ok, :json.decode(entity)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -618,10 +748,24 @@ defmodule Senzing.G2.Engine do
   @doc type: :getting_entities_and_records
   @spec get_entity(entity_id :: entity_id(), opts :: []) :: G2.result(entity())
   def get_entity(entity_id, opts \\ []) do
+    telemetry_metadata = %{
+      action: :get_entity,
+      entity_id: entity_id
+    }
+
     flags = Flags.normalize(opts[:flags], :entity_default_flags)
 
-    with {:ok, response} <- Nif.get_entity(entity_id, flags),
-         do: {:ok, :json.decode(response)}
+    :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
+      entity_id
+      |> Nif.get_entity(flags)
+      |> case do
+        {:ok, entity} ->
+          {{:ok, :json.decode(entity)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -643,17 +787,25 @@ defmodule Senzing.G2.Engine do
         ) ::
           G2.result(entity())
   def get_virtual_entity(record_ids, opts \\ []) do
+    telemetry_metadata = %{action: :get_virtual_entity}
+
     flags = Flags.normalize(opts[:flags], :entity_default_flags)
 
-    record_ids =
+    :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
       record_ids
       |> Enum.map(fn {id, data_source} -> %{"DATA_SOURCE" => data_source, "RECORD_ID" => id} end)
       |> then(&%{"RECORDS" => &1})
       |> :json.encode()
       |> IO.iodata_to_binary()
+      |> Nif.get_virtual_entity(flags)
+      |> case do
+        {:ok, record} ->
+          {{:ok, :json.decode(record)}, telemetry_metadata}
 
-    with {:ok, response} <- Nif.get_virtual_entity(record_ids, flags),
-         do: {:ok, :json.decode(response)}
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
@@ -676,15 +828,24 @@ defmodule Senzing.G2.Engine do
           opts :: [flags: flag() | [flag()], search_profile: String.t()]
         ) :: G2.result(map())
   def search_by_attributes(attributes, opts \\ []) do
+    search_profile = opts[:search_profile] || "SEARCH"
     flags = Flags.normalize(opts[:flags], :search_by_attributes_default_flags)
 
-    with {:ok, response} <-
-           Nif.search_by_attributes(
-             IO.iodata_to_binary(:json.encode(attributes)),
-             opts[:search_profile] || "SEARCH",
-             flags
-           ),
-         do: {:ok, :json.decode(response)}
+    telemetry_metadata = %{search_profile: search_profile}
+
+    :telemetry.span([:telemetry, :g2, :engine, :search], telemetry_metadata, fn ->
+      attributes
+      |> :json.encode()
+      |> IO.iodata_to_binary()
+      |> Nif.search_by_attributes(search_profile, flags)
+      |> case do
+        {:ok, response} ->
+          {{:ok, :json.decode(response)}, telemetry_metadata}
+
+        {:error, reason} ->
+          {{:error, reason}, telemetry_metadata}
+      end
+    end)
   end
 
   @doc """
