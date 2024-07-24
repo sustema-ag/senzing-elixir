@@ -55,7 +55,7 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
              check_timeout: non_neg_integer()
            }
 
-    @type out_event :: {Engine.redo_record(), Engine.mutation_info()}
+    @type out_event :: %{redo_record: Engine.redo_record(), mutation: Engine.mutation_info()}
 
     @spec start_link(options :: options()) :: GenServer.on_start()
     def start_link(options \\ []) do
@@ -148,10 +148,19 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
             ordered: false
           )
           |> Stream.map(fn
-            {:ok, result} -> result
-            {:error, reason} -> raise reason
+            {:ok, {:ok, {redo_record, mutation}}} ->
+              %{redo_record: redo_record, mutation: mutation}
+
+            {:ok, {:ok, nil}} ->
+              nil
+
+            {:ok, {:error, reason}} ->
+              raise reason
+
+            {:error, reason} ->
+              raise reason
           end)
-          |> Stream.map(fn {:ok, info} -> info end)
+          |> Enum.reject(&is_nil/1)
           |> Enum.to_list()
         end)
 
