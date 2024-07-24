@@ -13,12 +13,12 @@ defmodule Senzing.G2.Engine.PublisherTest do
              Engine.get_entity_by_record_id("preexisting", "TEST")
 
     events = [
-      {:add, {"TEST", %{"RECORD_ID" => "one"}}},
-      {:add, {"TEST", "two", %{"RECORD_TYPE" => "ORGANISATION"}}},
-      {:replace, {"TEST", "one", %{"RECORD_TYPE" => "ORGANISATION"}}},
-      {:delete, {"TEST", "two"}},
-      {:reevaluate_record, {"TEST", "one"}},
-      {:reevaluate_entity, preexisting_entity_id}
+      %{action: :add, data_source: "TEST", record: %{"RECORD_ID" => "one"}, correlation: :test},
+      %{action: :add, data_source: "TEST", record_id: "two", record: %{"RECORD_TYPE" => "ORGANISATION"}},
+      %{action: :replace, data_source: "TEST", record_id: "one", record: %{"RECORD_TYPE" => "ORGANISATION"}},
+      %{action: :delete, data_source: "TEST", record_id: "two"},
+      %{action: :reevaluate_record, data_source: "TEST", record_id: "one"},
+      %{action: :reevaluate_entity, entity_id: preexisting_entity_id}
     ]
 
     {:ok, producer} = GenStage.from_enumerable(events)
@@ -42,50 +42,63 @@ defmodule Senzing.G2.Engine.PublisherTest do
 
     assert [
              %{
-               "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_one}],
-               "DATA_SOURCE" => "TEST",
-               "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
-               "RECORD_ID" => "one"
+               correlation: :test,
+               mutation: %{
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_one}],
+                 "DATA_SOURCE" => "TEST",
+                 "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+                 "RECORD_ID" => "one"
+               }
              },
              %{
-               "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_two}],
-               "DATA_SOURCE" => "TEST",
-               "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
-               "RECORD_ID" => "two"
+               mutation: %{
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_two}],
+                 "DATA_SOURCE" => "TEST",
+                 "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+                 "RECORD_ID" => "two"
+               }
              },
              %{
-               "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_one}, %{"ENTITY_ID" => entity_id_two}],
-               "DATA_SOURCE" => "TEST",
-               "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
-               "RECORD_ID" => "one"
+               mutation: %{
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_one}, %{"ENTITY_ID" => entity_id_two}],
+                 "DATA_SOURCE" => "TEST",
+                 "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+                 "RECORD_ID" => "one"
+               }
              },
              %{
-               "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_two}],
-               "DATA_SOURCE" => "TEST",
-               "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
-               "RECORD_ID" => "two"
+               mutation: %{
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => entity_id_two}],
+                 "DATA_SOURCE" => "TEST",
+                 "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+                 "RECORD_ID" => "two"
+               }
              },
              %{
-               "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 2}],
-               "DATA_SOURCE" => "TEST",
-               "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
-               "RECORD_ID" => "one"
+               mutation: %{
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 2}],
+                 "DATA_SOURCE" => "TEST",
+                 "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+                 "RECORD_ID" => "one"
+               }
              },
              %{
-               "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
-               "DATA_SOURCE" => "TEST",
-               "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
-               "RECORD_ID" => "preexisting"
+               mutation: %{
+                 "AFFECTED_ENTITIES" => [%{"ENTITY_ID" => 1}],
+                 "DATA_SOURCE" => "TEST",
+                 "INTERESTING_ENTITIES" => %{"ENTITIES" => []},
+                 "RECORD_ID" => "preexisting"
+               }
              }
            ] = out_events
   end
 
   test "can act as only consumer" do
     events = [
-      {:add, {"TEST", %{"RECORD_ID" => "one"}}},
-      {:add, {"TEST", "two", %{"RECORD_TYPE" => "ORGANISATION"}}},
-      {:replace, {"TEST", "one", %{"RECORD_TYPE" => "ORGANISATION"}}},
-      {:delete, {"TEST", "two"}}
+      %{action: :add, data_source: "TEST", record: %{"RECORD_ID" => "one"}},
+      %{action: :add, data_source: "TEST", record_id: "two", record: %{"RECORD_TYPE" => "ORGANISATION"}},
+      %{action: :replace, data_source: "TEST", record_id: "one", record: %{"RECORD_TYPE" => "ORGANISATION"}},
+      %{action: :delete, data_source: "TEST", record_id: "two"}
     ]
 
     pid = self()

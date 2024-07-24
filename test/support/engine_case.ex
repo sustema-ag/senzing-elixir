@@ -35,7 +35,7 @@ defmodule Senzing.G2.EngineCase do
       |> Application.app_dir("priv/test/gleif_record_sample.json")
       |> File.stream!()
       |> Stream.map(&:json.decode/1)
-      |> Stream.map(&{:add, {"TEST", Map.put(&1, "DATA_SOURCE", "TEST")}})
+      |> Stream.map(&%{action: :add, data_source: "TEST", record: Map.put(&1, "DATA_SOURCE", "TEST")})
       |> GenStage.from_enumerable()
 
     {:ok, publisher} =

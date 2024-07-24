@@ -17,7 +17,7 @@ defmodule Senzing.G2.Engine.RedoProcessorTest do
 
     {:ok, redo_processor} = RedoProcessor.start_link()
 
-    assert [{%{"DATA_SOURCE" => "TEST", "DSRC_ACTION" => "X"}, %{"AFFECTED_ENTITIES" => _}} | _] =
+    assert [%{redo_record: %{"DATA_SOURCE" => "TEST", "DSRC_ACTION" => "X"}, mutation: %{"AFFECTED_ENTITIES" => _}} | _] =
              [{redo_processor, cancel: :transient}]
              |> GenStage.stream()
              |> Enum.take(redo_count)
