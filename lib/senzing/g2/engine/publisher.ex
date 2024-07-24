@@ -105,12 +105,12 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
     * `:event_timeout` - Timeout for each event
     """
     @type option() ::
-            {:name, atom()}
-            | {:produce_change_events, boolean()}
+            {:produce_change_events, boolean()}
             | {:consumer_options, [GenStage.consumer_option()]}
             | {:producer_consumer_options, [GenStage.producer_and_producer_consumer_option()]}
             | {:call_wrapper, call_wrapper_function()}
             | {:event_timeout, non_neg_integer()}
+            | GenServer.option()
     @type options() :: [option()]
 
     @typep init_options() :: %{
@@ -192,7 +192,13 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
       {:noreply, events, state}
     end
 
-    @start_options [:name]
+    @start_options [
+      :name,
+      :debug,
+      :timeout,
+      :spawn_opt,
+      :hibernate_after
+    ]
     @init_options [
       :produce_change_events,
       :concurrency,
@@ -206,15 +212,18 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
             {init_options :: init_options(), start_options :: Keyword.t()}
     defp extract_options(options) do
       options =
-        Keyword.validate!(options, [
-          :start,
-          produce_change_events: false,
-          concurrency: System.schedulers(),
-          consumer_options: [],
-          producer_consumer_options: [],
-          call_wrapper: nil,
-          event_timeout: :timer.seconds(5)
-        ])
+        Keyword.validate!(
+          options,
+          @start_options ++
+            [
+              produce_change_events: false,
+              concurrency: System.schedulers(),
+              consumer_options: [],
+              producer_consumer_options: [],
+              call_wrapper: nil,
+              event_timeout: :timer.seconds(5)
+            ]
+        )
 
       {options |> Keyword.take(@init_options) |> Map.new(), Keyword.take(options, @start_options)}
     end
