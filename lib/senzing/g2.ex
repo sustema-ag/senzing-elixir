@@ -3,7 +3,9 @@ defmodule Senzing.G2 do
   Shared functionality for Senzing G2
   """
 
-  @type error() :: {code :: integer(), message :: String.t()}
+  @typedoc false
+  @type internal_error() :: {code :: integer(), message :: String.t()} | :unexpected_error
+  @type error() :: Senzing.G2.Error.t()
   @type result() :: :ok | {:error, reason :: error()}
   @type result(t) :: {:ok, t} | {:error, reason :: error()}
 

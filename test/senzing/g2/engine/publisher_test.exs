@@ -3,6 +3,7 @@ defmodule Senzing.G2.Engine.PublisherTest do
 
   alias Senzing.G2.Engine
   alias Senzing.G2.Engine.Publisher
+  alias Senzing.G2.Error
 
   doctest Publisher
 
@@ -37,7 +38,7 @@ defmodule Senzing.G2.Engine.PublisherTest do
     assert {:ok, %{"RESOLVED_ENTITY" => %{"RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => "one"}]}}} =
              Engine.get_entity_by_record_id("one", "TEST")
 
-    assert {:error, {33, "0033E|Unknown record: dsrc[TEST], record[two]"}} =
+    assert {:error, %Error{code: 33, message: "Unknown record: dsrc[TEST], record[two]"}} =
              Engine.get_entity_by_record_id("two", "TEST")
 
     assert [
@@ -121,7 +122,7 @@ defmodule Senzing.G2.Engine.PublisherTest do
     assert {:ok, %{"RESOLVED_ENTITY" => %{"RECORDS" => [%{"DATA_SOURCE" => "TEST", "RECORD_ID" => "one"}]}}} =
              Engine.get_entity_by_record_id("one", "TEST")
 
-    assert {:error, {33, "0033E|Unknown record: dsrc[TEST], record[two]"}} =
+    assert {:error, %Error{code: 33, message: "Unknown record: dsrc[TEST], record[two]"}} =
              Engine.get_entity_by_record_id("two", "TEST")
   end
 end

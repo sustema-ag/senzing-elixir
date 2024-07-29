@@ -687,7 +687,7 @@ defmodule Senzing.G2.Engine.Nif do
       var reason = try get_and_clear_last_exception(env);
       return beam.make_error_pair(env, reason, .{});
     } else if(result == 0) {
-      return beam.make(env, .@"eof", .{});
+      return beam.make(env, .{.@"ok", .@"eof"}, .{});
     }
 
     return beam.make(env, .{.@"ok", responseBuf}, .{});

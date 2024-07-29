@@ -4,6 +4,7 @@ defmodule Senzing.G2.EngineTest do
   alias Senzing.G2.Config
   alias Senzing.G2.ConfigManager
   alias Senzing.G2.Engine
+  alias Senzing.G2.Error
   alias Senzing.G2.ResourceInit
 
   doctest Engine, except: [prime: 0]
@@ -297,7 +298,7 @@ defmodule Senzing.G2.EngineTest do
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
 
-      assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
+      Engine.add_record!(%{"RECORD_ID" => id}, "TEST")
 
       assert :ok = Engine.delete_record(id, "TEST")
 
@@ -317,7 +318,7 @@ defmodule Senzing.G2.EngineTest do
                 "RECORD_ID" => ^id
               }} = Engine.delete_record(id, "TEST", return_info: true)
 
-      assert {:error, {33, _message}} = Engine.get_entity_by_record_id(id, "TEST")
+      assert {:error, %Error{code: 33}} = Engine.get_entity_by_record_id(id, "TEST")
     end
   end
 
@@ -1104,7 +1105,7 @@ defmodule Senzing.G2.EngineTest do
 
       assert :ok = Engine.purge_repository()
 
-      assert {:error, {33, "0033E|Unknown record" <> _}} = Engine.get_entity_by_record_id(id, "TEST")
+      assert {:error, %Error{code: 33, message: "Unknown record" <> _}} = Engine.get_entity_by_record_id(id, "TEST")
     end
   end
 

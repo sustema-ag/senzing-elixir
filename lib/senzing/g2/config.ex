@@ -12,6 +12,9 @@ defmodule Senzing.G2.Config do
 
   use GenServer
 
+  import Senzing.Bang
+  import Senzing.G2.Error, only: [transform_result: 2]
+
   alias Senzing.G2
   alias Senzing.G2.Config.Nif
   alias Senzing.G2.ResourceInit
@@ -72,8 +75,8 @@ defmodule Senzing.G2.Config do
     opts
     |> Keyword.fetch(:load)
     |> case do
-      {:ok, config} -> Nif.load_it(config)
-      :error -> Nif.create()
+      {:ok, config} -> config |> Nif.load_it() |> transform_result(__MODULE__)
+      :error -> transform_result(Nif.create(), __MODULE__)
     end
     |> case do
       {:ok, config} -> {:ok, config}
@@ -83,14 +86,14 @@ defmodule Senzing.G2.Config do
 
   @doc false
   @impl GenServer
-  def terminate(_reason, config), do: Nif.close(config)
+  def terminate(_reason, config), do: config |> Nif.close() |> transform_result(__MODULE__)
 
   @doc false
   @impl GenServer
   def handle_call(:list_data_sources, _from, config) do
     {:reply,
      with(
-       {:ok, response} <- Nif.list_data_sources(config),
+       {:ok, response} <- config |> Nif.list_data_sources() |> transform_result(__MODULE__),
        %{"DATA_SOURCES" => data_sources} <- :json.decode(response),
        do: {:ok, data_sources}
      ), config}
@@ -100,16 +103,21 @@ defmodule Senzing.G2.Config do
     {:reply,
      with(
        {:ok, response} <-
-         Nif.add_data_source(config, IO.iodata_to_binary(:json.encode(data_source))),
+         config
+         |> Nif.add_data_source(IO.iodata_to_binary(:json.encode(data_source)))
+         |> transform_result(__MODULE__),
        do: {:ok, :json.decode(response)}
      ), config}
   end
 
   def handle_call({:delete_data_source, data_source}, _from, config),
-    do: {:reply, Nif.delete_data_source(config, IO.iodata_to_binary(:json.encode(data_source))), config}
+    do:
+      {:reply,
+       config |> Nif.delete_data_source(IO.iodata_to_binary(:json.encode(data_source))) |> transform_result(__MODULE__),
+       config}
 
   def handle_call(:save, _from, config) do
-    {:reply, Nif.save(config), config}
+    {:reply, config |> Nif.save() |> transform_result(__MODULE__), config}
   end
 
   ##############################################################################
@@ -130,7 +138,10 @@ defmodule Senzing.G2.Config do
           options :: resource_init_options()
         ) :: G2.result()
   def resource_init(name, config, options \\ []) when is_binary(name) and is_map(config),
-    do: Nif.init(name, IO.iodata_to_binary(:json.encode(config)), options[:verbose_logging] || false)
+    do:
+      name
+      |> Nif.init(IO.iodata_to_binary(:json.encode(config)), options[:verbose_logging] || false)
+      |> transform_result(__MODULE__)
 
   # This method will destroy and perform cleanup for the G2 Config object.
   #
@@ -138,7 +149,7 @@ defmodule Senzing.G2.Config do
   @doc false
   @impl ResourceInit
   @spec resource_destroy() :: G2.result()
-  defdelegate resource_destroy, to: Nif, as: :destroy
+  def resource_destroy, do: transform_result(Nif.destroy(), __MODULE__)
 
   ##############################################################################
   # Exposed Functions
@@ -157,6 +168,9 @@ defmodule Senzing.G2.Config do
   @doc type: :configuration_object_management
   @spec save(server :: GenServer.server()) :: G2.result(t())
   def save(server), do: GenServer.call(server, :save)
+
+  @doc type: :configuration_object_management
+  defbang save!(server)
 
   @doc """
   Returns a list of data sources contained in an in-memory configuration.
@@ -177,6 +191,9 @@ defmodule Senzing.G2.Config do
   @doc type: :datasource_management
   @spec list_data_sources(server :: GenServer.server()) :: G2.result([data_source()])
   def list_data_sources(server), do: GenServer.call(server, :list_data_sources)
+
+  @doc type: :datasource_management
+  defbang list_data_sources!(server)
 
   @doc """
   Add Data Source
@@ -203,6 +220,9 @@ defmodule Senzing.G2.Config do
   @spec add_data_source(server :: GenServer.server(), data_source :: data_source()) ::
           G2.result(data_source())
   def add_data_source(server, data_source), do: GenServer.call(server, {:add_data_source, data_source})
+
+  @doc type: :datasource_management
+  defbang add_data_source!(server, data_source)
 
   @doc """
   Delete Data Source
@@ -231,4 +251,7 @@ defmodule Senzing.G2.Config do
   @spec delete_data_source(server :: GenServer.server(), data_source :: data_source()) ::
           G2.result()
   def delete_data_source(server, data_source), do: GenServer.call(server, {:delete_data_source, data_source})
+
+  @doc type: :datasource_management
+  defbang delete_data_source!(server, data_source)
 end

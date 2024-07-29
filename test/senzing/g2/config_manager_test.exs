@@ -3,6 +3,7 @@ defmodule Senzing.G2.ConfigManagerTest do
 
   alias Senzing.G2.Config
   alias Senzing.G2.ConfigManager
+  alias Senzing.G2.Error
   alias Senzing.G2.ResourceInit
 
   doctest Config
@@ -56,7 +57,7 @@ defmodule Senzing.G2.ConfigManagerTest do
     end
 
     test "errors with invalid id" do
-      assert {:error, {7221, "7221E|No engine configuration registered with data ID [7]."}} =
+      assert {:error, %Error{code: 7221, message: "No engine configuration registered with data ID [7]."}} =
                ConfigManager.set_default_config_id(7)
     end
   end
@@ -72,7 +73,7 @@ defmodule Senzing.G2.ConfigManagerTest do
     test "errors with invalid old id", %{config: config} do
       assert {:ok, config_id} = ConfigManager.add_config(config)
 
-      assert {:error, {7245, "7245E|Current configuration ID does not match specified data ID [7]."}} =
+      assert {:error, %Error{code: 7245, message: "Current configuration ID does not match specified data ID [7]."}} =
                ConfigManager.replace_default_config_id(config_id, 7)
     end
 
@@ -80,7 +81,7 @@ defmodule Senzing.G2.ConfigManagerTest do
       assert {:ok, config_id} = ConfigManager.add_config(config)
       assert :ok = ConfigManager.set_default_config_id(config_id)
 
-      assert {:error, {7221, "7221E|No engine configuration registered with data ID [7]."}} =
+      assert {:error, %Error{code: 7221, message: "No engine configuration registered with data ID [7]."}} =
                ConfigManager.replace_default_config_id(7, config_id)
     end
   end
