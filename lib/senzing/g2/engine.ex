@@ -5,6 +5,9 @@ defmodule Senzing.G2.Engine do
 
   @behaviour Senzing.G2.ResourceInit
 
+  import Senzing.Bang
+  import Senzing.G2.Error, only: [transform_result: 2]
+
   alias Senzing.G2
   alias Senzing.G2.Config
   alias Senzing.G2.ConfigManager
@@ -151,11 +154,12 @@ defmodule Senzing.G2.Engine do
       end
 
     with :ok <-
-           init.(
-             name,
+           name
+           |> init.(
              IO.iodata_to_binary(:json.encode(config)),
              options[:verbose_logging] || false
-           ) do
+           )
+           |> transform_result(__MODULE__) do
       if options[:prime], do: prime(), else: :ok
     end
   end
@@ -176,7 +180,10 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :initialization
   @spec reinit(config_id :: integer()) :: G2.result()
-  defdelegate reinit(config_ig), to: Nif
+  def reinit(config_id), do: config_id |> Nif.reinit() |> transform_result(__MODULE__)
+
+  @doc type: :initialization
+  defbang reinit!(config_id)
 
   @doc """
   This method may optionally be called to pre-initialize some of the heavier
@@ -192,7 +199,10 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :initialization
   @spec prime() :: G2.result()
-  defdelegate prime(), to: Nif
+  def prime, do: transform_result(Nif.prime(), __MODULE__)
+
+  @doc type: :initialization
+  defbang prime!()
 
   @doc """
   This method returns an identifier for the loaded G2 engine configuration.
@@ -208,7 +218,10 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :initialization
   @spec get_active_config_id() :: G2.result(ConfigManager.config_id())
-  defdelegate get_active_config_id(), to: Nif
+  def get_active_config_id, do: transform_result(Nif.get_active_config_id(), __MODULE__)
+
+  @doc type: :initialization
+  defbang get_active_config_id!()
 
   @doc """
   This method will export the current configuration of the G2 engine.
@@ -226,7 +239,10 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :initialization
   @spec export_config() :: G2.result({Config.t(), ConfigManager.config_id()})
-  defdelegate export_config(), to: Nif
+  def export_config, do: transform_result(Nif.export_config(), __MODULE__)
+
+  @doc type: :initialization
+  defbang export_config!()
 
   @doc """
   This method returns the date of when the entity datastore was last modified.
@@ -242,9 +258,12 @@ defmodule Senzing.G2.Engine do
   @doc type: :initialization
   @spec get_repository_last_modified() :: G2.result(DateTime.t())
   def get_repository_last_modified do
-    with {:ok, time} <- Nif.get_repository_last_modified(),
+    with {:ok, time} <- transform_result(Nif.get_repository_last_modified(), __MODULE__),
          do: DateTime.from_unix(time, :millisecond)
   end
+
+  @doc type: :initialization
+  defbang get_repository_last_modified!()
 
   @doc """
   This method is used to add entity data into the system.
@@ -313,6 +332,7 @@ defmodule Senzing.G2.Engine do
         opts[:return_record_id] || false,
         opts[:return_info] || false
       )
+      |> transform_result(__MODULE__)
       |> case do
         :ok ->
           {:ok, telemetry_metadata}
@@ -326,6 +346,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :add_records
+  defbang add_record!(record, data_source, opts \\ [])
 
   @doc """
   This method is used to replace entity data in the system.
@@ -382,6 +405,7 @@ defmodule Senzing.G2.Engine do
         opts[:load_id],
         opts[:return_info] || false
       )
+      |> transform_result(__MODULE__)
       |> case do
         :ok ->
           {:ok, telemetry_metadata}
@@ -394,6 +418,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :replace_records
+  defbang replace_record!(record, record_id, data_source, opts \\ [])
 
   @doc """
   Reevaluate a record in the database.
@@ -429,6 +456,7 @@ defmodule Senzing.G2.Engine do
     :telemetry.span([:telemetry, :g2, :engine, :reevaluate], telemetry_metadata, fn ->
       data_source
       |> Nif.reevaluate_record(record_id, opts[:return_info] || false)
+      |> transform_result(__MODULE__)
       |> case do
         :ok ->
           {:ok, telemetry_metadata}
@@ -441,6 +469,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :reevaluating
+  defbang reevaluate_record!(record_id, data_source, opts \\ [])
 
   @doc """
   Reevaluate an entity in the database.
@@ -469,6 +500,7 @@ defmodule Senzing.G2.Engine do
     :telemetry.span([:telemetry, :g2, :engine, :reevaluate], telemetry_metadata, fn ->
       entity_id
       |> Nif.reevaluate_entity(opts[:return_info] || false)
+      |> transform_result(__MODULE__)
       |> case do
         :ok ->
           {:ok, telemetry_metadata}
@@ -482,6 +514,9 @@ defmodule Senzing.G2.Engine do
     end)
   end
 
+  @doc type: :reevaluating
+  defbang reevaluate_entity!(entity_id, opts \\ [])
+
   @doc """
   Get the number of records contained in the internal redo-queue.
 
@@ -494,7 +529,10 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :redo_processing
   @spec count_redo_records :: G2.result(integer())
-  defdelegate count_redo_records, to: Nif
+  def count_redo_records, do: transform_result(Nif.count_redo_records(), __MODULE__)
+
+  @doc type: :redo_processing
+  defbang count_redo_records!()
 
   @doc """
   Retrieve a record contained in the internal redo-queue.
@@ -511,12 +549,17 @@ defmodule Senzing.G2.Engine do
   @doc type: :redo_processing
   @spec get_redo_record :: G2.result(redo_record() | nil)
   def get_redo_record do
-    case Nif.get_redo_record() do
+    Nif.get_redo_record()
+    |> transform_result(__MODULE__)
+    |> case do
       {:ok, ""} -> {:ok, nil}
       {:ok, record} -> {:ok, :json.decode(record)}
       {:error, reason} -> {:error, reason}
     end
   end
+
+  @doc type: :redo_processing
+  defbang get_redo_record!()
 
   @doc """
   This method will send a record for processing in g2.
@@ -546,6 +589,7 @@ defmodule Senzing.G2.Engine do
       |> :json.encode()
       |> IO.iodata_to_binary()
       |> Nif.process_redo_record(opts[:return_info] || false)
+      |> transform_result(__MODULE__)
       |> case do
         :ok ->
           {:ok, telemetry_metadata}
@@ -558,6 +602,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :redo_processing
+  defbang process_redo_record!(record, opts \\ [])
 
   @doc """
   Process a record contained in the internal redo-queue.
@@ -586,6 +633,7 @@ defmodule Senzing.G2.Engine do
 
       return_info
       |> Nif.process_next_redo_record()
+      |> transform_result(__MODULE__)
       |> case do
         {:ok, {"", ""}} when return_info ->
           {{:ok, nil}, telemetry_metadata}
@@ -604,6 +652,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :redo_processing
+  defbang process_next_redo_record!(opts \\ [])
 
   @doc """
   This method is used to delete observation data from the system.
@@ -636,6 +687,7 @@ defmodule Senzing.G2.Engine do
     :telemetry.span([:telemetry, :g2, :engine, :write], telemetry_metadata, fn ->
       data_source
       |> Nif.delete_record(record_id, opts[:load_id], opts[:return_info] || false)
+      |> transform_result(__MODULE__)
       |> case do
         :ok ->
           {:ok, telemetry_metadata}
@@ -648,6 +700,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :deleting_records
+  defbang delete_record!(record_id, data_source, opts \\ [])
 
   @doc """
   This method is used to retrieve a stored record.
@@ -679,6 +734,7 @@ defmodule Senzing.G2.Engine do
     :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
       data_source
       |> Nif.get_record(record_id, flags)
+      |> transform_result(__MODULE__)
       |> case do
         {:ok, record} ->
           {{:ok, :json.decode(record)}, telemetry_metadata}
@@ -688,6 +744,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :getting_entities_and_records
+  defbang get_record!(record_id, data_source, opts \\ [])
 
   @doc """
   This method is used to retrieve information about a specific resolved entity.
@@ -719,6 +778,7 @@ defmodule Senzing.G2.Engine do
     :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
       data_source
       |> Nif.get_entity_by_record_id(record_id, flags)
+      |> transform_result(__MODULE__)
       |> case do
         {:ok, entity} ->
           {{:ok, :json.decode(entity)}, telemetry_metadata}
@@ -728,6 +788,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :getting_entities_and_records
+  defbang get_entity_by_record_id!(record_id, data_source, opts \\ [])
 
   @doc """
   This method is used to retrieve information about a specific resolved entity.
@@ -758,6 +821,7 @@ defmodule Senzing.G2.Engine do
     :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
       entity_id
       |> Nif.get_entity(flags)
+      |> transform_result(__MODULE__)
       |> case do
         {:ok, entity} ->
           {{:ok, :json.decode(entity)}, telemetry_metadata}
@@ -767,6 +831,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :getting_entities_and_records
+  defbang get_entity!(entity_id, opts \\ [])
 
   @doc """
   This method gives information on how an entity composed of a given set of records would look.
@@ -798,6 +865,7 @@ defmodule Senzing.G2.Engine do
       |> :json.encode()
       |> IO.iodata_to_binary()
       |> Nif.get_virtual_entity(flags)
+      |> transform_result(__MODULE__)
       |> case do
         {:ok, record} ->
           {{:ok, :json.decode(record)}, telemetry_metadata}
@@ -807,6 +875,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :getting_entities_and_records
+  defbang get_virtual_entity!(record_ids, opts \\ [])
 
   @doc """
   This method searches for entities that contain attribute information that are
@@ -838,6 +909,7 @@ defmodule Senzing.G2.Engine do
       |> :json.encode()
       |> IO.iodata_to_binary()
       |> Nif.search_by_attributes(search_profile, flags)
+      |> transform_result(__MODULE__)
       |> case do
         {:ok, response} ->
           {{:ok, :json.decode(response)}, telemetry_metadata}
@@ -847,6 +919,9 @@ defmodule Senzing.G2.Engine do
       end
     end)
   end
+
+  @doc type: :searching_for_entities
+  defbang search_by_attributes!(attributes, opts \\ [])
 
   @doc """
   This method is used to find a relationship path between entities.
@@ -903,16 +978,20 @@ defmodule Senzing.G2.Engine do
       end
 
     with {:ok, response} <-
-           Nif.find_path_by_entity_id(
-             start_entity_id,
+           start_entity_id
+           |> Nif.find_path_by_entity_id(
              end_entity_id,
              max_degree,
              flags,
              exclude,
              included_data_sources
-           ),
+           )
+           |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :finding_paths
+  defbang find_path_by_entity_id!(start_entity_id, end_entity_id, max_degree, opts \\ [])
 
   @doc """
   This method is used to find a relationship path between records.
@@ -980,8 +1059,8 @@ defmodule Senzing.G2.Engine do
       end
 
     with {:ok, response} <-
-           Nif.find_path_by_record_id(
-             start_record_id,
+           start_record_id
+           |> Nif.find_path_by_record_id(
              start_record_data_source,
              end_record_id,
              end_record_data_source,
@@ -989,9 +1068,13 @@ defmodule Senzing.G2.Engine do
              flags,
              exclude,
              included_data_sources
-           ),
+           )
+           |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :finding_paths
+  defbang find_path_by_record_id!(start_record, end_record, max_degree, opts \\ [])
 
   @doc """
   This method is used to find a network of entity relationships, surrounding the
@@ -1032,15 +1115,19 @@ defmodule Senzing.G2.Engine do
       |> IO.iodata_to_binary()
 
     with {:ok, response} <-
-           Nif.find_network_by_entity_id(
-             entity_ids,
+           entity_ids
+           |> Nif.find_network_by_entity_id(
              opts[:max_degree] || 3,
              opts[:buildout_degree] || 10,
              opts[:max_entities] || 100,
              flags
-           ),
+           )
+           |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :finding_networks
+  defbang find_network_by_entity_id!(entity_ids, opts \\ [])
 
   @doc """
   This method is used to find a network of entity relationships, surrounding the
@@ -1087,15 +1174,19 @@ defmodule Senzing.G2.Engine do
       |> IO.iodata_to_binary()
 
     with {:ok, response} <-
-           Nif.find_network_by_record_id(
-             record_ids,
+           record_ids
+           |> Nif.find_network_by_record_id(
              opts[:max_degree] || 3,
              opts[:buildout_degree] || 10,
              opts[:max_entities] || 100,
              flags
-           ),
+           )
+           |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :finding_networks
+  defbang find_network_by_record_id!(record_ids, opts \\ [])
 
   @doc """
   This method determines how records are related to each other.
@@ -1138,15 +1229,19 @@ defmodule Senzing.G2.Engine do
     {right_record_id, right_data_source} = right_record
 
     with {:ok, response} <-
-           Nif.why_records(
-             left_record_id,
+           left_record_id
+           |> Nif.why_records(
              left_data_source,
              right_record_id,
              right_data_source,
              flags
-           ),
+           )
+           |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :why
+  defbang why_records!(left_record, right_record, opts \\ [])
 
   @doc """
   This method determines why records are included in the resolved entity they belong to.
@@ -1172,9 +1267,14 @@ defmodule Senzing.G2.Engine do
     flags = Flags.normalize(opts[:flags], :why_entity_default_flags)
 
     with {:ok, response} <-
-           Nif.why_entity_by_record_id(record_id, data_source, flags),
+           record_id
+           |> Nif.why_entity_by_record_id(data_source, flags)
+           |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :why
+  defbang why_entity_by_record_id!(record_id, data_source, opts \\ [])
 
   @doc """
   This method determines why records are included in the resolved entity they belong to.
@@ -1199,9 +1299,12 @@ defmodule Senzing.G2.Engine do
     flags = Flags.normalize(opts[:flags], :why_entity_default_flags)
 
     with {:ok, response} <-
-           Nif.why_entity_by_entity_id(entity_id, flags),
+           entity_id |> Nif.why_entity_by_entity_id(flags) |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :why
+  defbang why_entity_by_entity_id!(entity_id, opts \\ [])
 
   @doc """
   This method determines how entities are related to each other.
@@ -1226,9 +1329,14 @@ defmodule Senzing.G2.Engine do
     flags = Flags.normalize(opts[:flags], :why_entity_default_flags)
 
     with {:ok, response} <-
-           Nif.why_entities(left_entity_id, right_entity_id, flags),
+           left_entity_id
+           |> Nif.why_entities(right_entity_id, flags)
+           |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :why
+  defbang why_entities!(left_entity_id, right_entity_id, opts \\ [])
 
   @doc """
   This method gives information on how entities were constructed from their base records.
@@ -1267,9 +1375,12 @@ defmodule Senzing.G2.Engine do
     flags = Flags.normalize(opts[:flags], :how_entity_default_flags)
 
     with {:ok, response} <-
-           Nif.how_entity_by_entity_id(entity_id, flags),
+           entity_id |> Nif.how_entity_by_entity_id(flags) |> transform_result(__MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :how
+  defbang how_entity_by_entity_id!(entity_id, opts \\ [])
 
   @default_export_csv_entity_report_column_list [
     "RESOLVED_ENTITY_ID",
@@ -1328,20 +1439,32 @@ defmodule Senzing.G2.Engine do
 
     Stream.resource(
       fn ->
-        case Nif.export_csv_entity_report(column_list, flags) do
+        column_list
+        |> Nif.export_csv_entity_report(flags)
+        |> transform_result(__MODULE__)
+        |> case do
           {:ok, handle} -> handle
           {:error, reason} -> raise reason
         end
       end,
       fn handle ->
-        case Nif.export_fetch_next(handle) do
-          :eof -> {:halt, handle}
+        handle
+        |> Nif.export_fetch_next()
+        |> transform_result(__MODULE__)
+        |> case do
+          {:ok, :eof} -> {:halt, handle}
           {:ok, data} -> {[data], handle}
           {:error, reason} -> raise reason
         end
       end,
       fn handle ->
-        :ok = Nif.export_close(handle)
+        handle
+        |> Nif.export_close()
+        |> transform_result(__MODULE__)
+        |> case do
+          :ok -> :ok
+          {:error, reason} -> raise reason
+        end
       end
     )
   end
@@ -1373,20 +1496,32 @@ defmodule Senzing.G2.Engine do
 
     Stream.resource(
       fn ->
-        case Nif.export_json_entity_report(flags) do
+        flags
+        |> Nif.export_json_entity_report()
+        |> transform_result(__MODULE__)
+        |> case do
           {:ok, handle} -> handle
           {:error, reason} -> raise reason
         end
       end,
       fn handle ->
-        case Nif.export_fetch_next(handle) do
-          :eof -> {:halt, handle}
+        handle
+        |> Nif.export_fetch_next()
+        |> transform_result(__MODULE__)
+        |> case do
+          {:ok, :eof} -> {:halt, handle}
           {:ok, data} -> {[data], handle}
           {:error, reason} -> raise reason
         end
       end,
       fn handle ->
-        :ok = Nif.export_close(handle)
+        handle
+        |> Nif.export_close()
+        |> transform_result(__MODULE__)
+        |> case do
+          :ok -> :ok
+          {:error, reason} -> raise reason
+        end
       end
     )
   end
@@ -1404,7 +1539,10 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :cleanup
   @spec purge_repository() :: G2.result()
-  defdelegate purge_repository, to: Nif
+  def purge_repository, do: transform_result(Nif.purge_repository(), __MODULE__)
+
+  @doc type: :cleanup
+  defbang purge_repository!()
 
   @doc """
   This method returns a JSON document that provides basic statistics on the requests made through the G2 object.
@@ -1423,9 +1561,12 @@ defmodule Senzing.G2.Engine do
   @doc type: :statistics
   @spec stats() :: G2.result(map())
   def stats do
-    with {:ok, response} <- Nif.stats(),
+    with {:ok, response} <- transform_result(Nif.stats(), __MODULE__),
          do: {:ok, :json.decode(response)}
   end
+
+  @doc type: :statistics
+  defbang stats!()
 
   # This method will destroy and perform cleanup for the G2 processing object.
   #
@@ -1433,5 +1574,5 @@ defmodule Senzing.G2.Engine do
   @doc false
   @impl ResourceInit
   @spec resource_destroy() :: G2.result()
-  defdelegate resource_destroy, to: Nif, as: :destroy
+  def resource_destroy, do: transform_result(Nif.destroy(), __MODULE__)
 end

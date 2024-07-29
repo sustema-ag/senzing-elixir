@@ -10,6 +10,9 @@ defmodule Senzing.G2.ConfigManager do
 
   @behaviour Senzing.G2.ResourceInit
 
+  import Senzing.Bang
+  import Senzing.G2.Error, only: [transform_result: 2]
+
   alias Senzing.G2
   alias Senzing.G2.Config
   alias Senzing.G2.ConfigManager.Nif
@@ -39,7 +42,10 @@ defmodule Senzing.G2.ConfigManager do
           options :: resource_init_options()
         ) :: G2.result()
   def resource_init(name, ini_params, options \\ []) when is_binary(name) and is_map(ini_params),
-    do: Nif.init(name, IO.iodata_to_binary(:json.encode(ini_params)), options[:verbose_logging] || false)
+    do:
+      name
+      |> Nif.init(IO.iodata_to_binary(:json.encode(ini_params)), options[:verbose_logging] || false)
+      |> transform_result(__MODULE__)
 
   # This method will destroy and perform cleanup for the G2 Config object.
   #
@@ -47,7 +53,7 @@ defmodule Senzing.G2.ConfigManager do
   @doc false
   @impl ResourceInit
   @spec resource_destroy() :: G2.result()
-  defdelegate resource_destroy, to: Nif, as: :destroy
+  def resource_destroy, do: transform_result(Nif.destroy(), __MODULE__)
 
   ##############################################################################
   # Exposed Functions
@@ -68,7 +74,10 @@ defmodule Senzing.G2.ConfigManager do
 
   """
   @spec add_config(config :: Config.t(), opts :: [comment: String.t()]) :: G2.result(config_id())
-  def add_config(config, opts \\ []), do: Nif.add_config(config, Keyword.get(opts, :comment, ""))
+  def add_config(config, opts \\ []),
+    do: config |> Nif.add_config(Keyword.get(opts, :comment, "")) |> transform_result(__MODULE__)
+
+  defbang add_config!(config, opts \\ [])
 
   @doc """
   Retrieves a specific configuration JSON document from the data repository.
@@ -86,7 +95,9 @@ defmodule Senzing.G2.ConfigManager do
 
   """
   @spec get_config(config_id :: config_id()) :: G2.result(Config.t())
-  def get_config(config_id), do: Nif.get_config(config_id)
+  def get_config(config_id), do: config_id |> Nif.get_config() |> transform_result(__MODULE__)
+
+  defbang get_config!(config_id)
 
   @doc """
   Retrieves a list of the configuration JSON documents contained in the data repository.
@@ -102,10 +113,12 @@ defmodule Senzing.G2.ConfigManager do
   """
   @spec list_configs() :: G2.result([config_parameters()])
   def list_configs do
-    with {:ok, json} <- Nif.list_configs(),
+    with {:ok, json} <- transform_result(Nif.list_configs(), __MODULE__),
          %{"CONFIGS" => configs} <- :json.decode(json),
          do: {:ok, configs}
   end
+
+  defbang list_configs!()
 
   @doc """
   Retrieves a specific configuration ID from the data repository.
@@ -120,7 +133,9 @@ defmodule Senzing.G2.ConfigManager do
 
   """
   @spec get_default_config_id() :: G2.result(config_id())
-  defdelegate get_default_config_id, to: Nif
+  def get_default_config_id, do: transform_result(Nif.get_default_config_id(), __MODULE__)
+
+  defbang get_default_config_id!()
 
   @doc """
   Sets the default configuration JSON document in the data repository.
@@ -139,7 +154,9 @@ defmodule Senzing.G2.ConfigManager do
 
   """
   @spec set_default_config_id(config_id :: config_id()) :: G2.result()
-  defdelegate set_default_config_id(config_id), to: Nif
+  def set_default_config_id(config_id), do: config_id |> Nif.set_default_config_id() |> transform_result(__MODULE__)
+
+  defbang set_default_config_id!(config_id)
 
   @doc """
   Checks the current default configuration ID, and if it matches, replaces it with another configured ID in the database.
@@ -164,5 +181,8 @@ defmodule Senzing.G2.ConfigManager do
   """
   @spec replace_default_config_id(new_config_id :: config_id(), old_config_id :: config_id()) ::
           G2.result()
-  defdelegate replace_default_config_id(new_config_id, old_config_id), to: Nif
+  def replace_default_config_id(new_config_id, old_config_id),
+    do: new_config_id |> Nif.replace_default_config_id(old_config_id) |> transform_result(__MODULE__)
+
+  defbang replace_default_config_id!(new_config_id, old_config_id)
 end
