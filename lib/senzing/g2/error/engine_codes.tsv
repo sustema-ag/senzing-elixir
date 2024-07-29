@@ -1,0 +1,516 @@
+Code	Error	Description
+5555E	EAS_ERR_GENERIC	{0}
+5555D	EAS_MSG_DETAIL	{0}
+5555W	EAS_WRN_GENERIC	{0}
+5555I	EAS_INF_GENERIC	{0}
+0001E	EAS_ERR_UNHANDLED_EXCEPTION 	Unhandled exception.
+0002E	EAS_ERR_INVALID_XML 	Invalid XML
+0003E	EAS_ERR_NO_INPUT_TRANSPORT 	No Input Transport Specified
+0004E	EAS_ERR_EXCEEDED_MAX_ERRORS 	Exceeded the Maximum Number of Errors Allowed
+0005E	EAS_ERR_EXCEEDED_MAX_RETRIES 	Exceeded the Maximum Number of Retries Allowed
+0006E	EAS_ERR_BUS_CLOSED 	The bus has been shut down
+0007E	EAS_ERR_EMPTY_XML_MESSAGE 	Empty XML Message
+0008E	EAS_ERR_UNEXPECTED_EOF 	Reached end of file unexpectedly
+0009E	EAS_ERR_INVALID_MESSAGE_RECEIVED 	Invalid message received from the cmebus
+0010E	EAS_ERR_MALFORMED_URI 	Malformed URI
+0011E	EAS_ERR_MULTIPLE_RESPONSES_SET_FOR_ONE_MESSAGE 	Called twice for one message
+0012E	EAS_ERR_MISSING_UMF_PROC_NAME 	UMF_PROC name not specified in the UMF message
+0013E	EAS_ERR_INVALID_DATABASE_TYPE 	Invalid Database Type
+0014E	EAS_ERR_INVALID_DATASTORE_CONFIGURATION_TYPE 	Invalid Datastore Configuration Type
+0015E	EAS_ERR_ICU_TRANSLIT_INIT	Could not create ICU Transliterator due to ICU error: {0}
+0017E	EAS_ERR_SEQUENCE_DB_FAILURE	No Sequence Controller configured
+0019E	EAS_ERR_NO_CONFIGURATION_FOUND	Configuration not found
+0020E	EAS_ERR_CONFIG_CANNOT_BE_NULL_DATABASE 	Configuration cannot be loaded from database connection
+0021E	EAS_ERR_CONFIG_CANNOT_BE_NULL_CONFIG_FILE 	Configuration cannot be loaded from config file
+0022E	EAS_ERR_INVALID_DOCTYPE 	Invalid DocType {0}
+0023E	EAS_ERR_CONFLICTING_DATA_SOURCE_VALUES 	Conflicting DATA_SOURCE values '{0}' and '{1}'
+0024E	EAS_ERR_CONFLICTING_RECORD_ID_VALUES	Conflicting RECORD_ID values '{0}' and '{1}'
+0025E	EAS_ERR_CONFLICTING_LOAD_ID_VALUES	Conflicting LOAD_ID values '{0}' and '{1}'
+0026E	EAS_ERR_RESERVED_WORD_USED_IN_DOCUMENT	Inbound data contains a reserved keyword '{0}'
+0027E	EAS_ERR_UNKNOWN_DSRC_CODE_VALUE	Unknown DATA_SOURCE value '{0}'
+0028E	EAS_ERR_INVALID_JSON_CONFIG_DOCUMENT	Invalid JSON config document
+0029E	EAS_ERR_INVALID_HANDLE	Invalid Handle
+0030E	EAS_ERR_INVALID_MATCH_LEVEL	Invalid match level '{0}'
+0031E	EAS_ERR_UNKNOWN_LENS_VALUE	Unknown lens value '{0}'
+0032E	EAS_ERR_UNKNOWN_ENTITY_TYPE_VALUE	Unknown entity type value '{0}'
+0033E	EAS_ERR_UNKNOWN_DSRC_RECORD_ID	Unknown record: dsrc[{0}], record[{1}]
+0034E	EAS_ERR_AMBIGUOUS_ENTITY_FTYPE_MISSING 	AMBIGUOUS_ENTITY Feature Type is not configured
+0035E	EAS_ERR_AMBIGUOUS_TIER_FELEM_MISSING 	AMBIGUOUS_TIER Feature Element is not configured
+0036E	EAS_ERR_AMBIGUOUS_FTYPE_ID_FELEM_MISSING 	AMBIGUOUS_FTYPE_ID Feature Element is not configured
+0037E	EAS_ERR_UNKNOWN_RESOLVED_ENTITY_VALUE	Unknown resolved entity value '{0}'
+0038E	EAS_ERR_RECORD_HAS_NO_RESOLVED_ENTITY	Data source record has no resolved entity: dsrc[{0}], recordID[{1}]
+0039E	EAS_ERR_NO_OBSERVED_ENTITY_FOR_DSRC_ENTITY_KEY	No observed entity for entity key: dsrc[{0}], record_id[{1}], key[{2}]
+0040E	EAS_ERR_CONFIG_COMPATIBILITY_MISMATCH	The engine configuration compatibility version [{0}] does not match the version of the provided config[{1}].
+0041E	EAS_ERR_DOCUMENT_PREPROCESSING_FAILED 	Document preprocessing failed
+0042E	EAS_ERR_DOCUMENT_LOAD_PROCESSING_FAILED 	Document load processing failed
+0043E	EAS_ERR_DOCUMENT_ER_PROCESSING_FAILED 	Document ER processing failed
+0044E	EAS_ERR_CHECK_ENTITY_PROCESSING_FAILED 	Check entity processing failed
+0045E	EAS_ERR_UMF_PROC_PROCESSING_FAILED 	UMF procedure processing failed
+0046E	EAS_ERR_DOCUMENT_HASHING_PROCESSING_FAILED 	Document hashing-processing failed
+0047E	EAS_ERR_SESSION_IS_INVALID 	Session is invalid
+0048E	EAS_ERR_G2_NOT_INITIALIZED 	G2 is not initialized
+0049E	EAS_ERR_G2AUDIT_NOT_INITIALIZED 	G2Audit is not initialized
+0050E	EAS_ERR_G2HASHER_NOT_INITIALIZED 	G2Hasher is not initialized
+0051E	EAS_ERR_BOTH_RECORD_ID_AND_ENT_SRC_KEY_SPECIFIED 	Cannot use both Record ID and Entity Source Key in record
+0052E	EAS_ERR_UNKNOWN_RELATIONSHIP_ID_VALUE	Unknown relationship ID value '{0}'
+0053E	EAS_ERR_G2DIAGNOSTIC_NOT_INITIALIZED 	G2Diagnostic is not initialized
+0054E	EAS_ERR_G2_DATA_REPOSITORY_WAS_PURGED 	Data repository was purged
+0055E	EAS_ERR_NO_RESOLVED_ENTITY_FOR_DSRC_ENTITY_KEY	No resolved entity for entity key: dsrc[{0}], record_id[{1}], key[{2}]
+0056E	EAS_ERR_NO_RECORDS_EXIST_FOR_RESOLVED_ENTITY	No data source records exist for entity ID: entityID[{0}], lensCode[{1}]
+0060E	EAS_ERR_CONFIG_DATABASE_MISTMATCH	The engine configuration does not match the records loaded into the repository:  errors[{0}].
+999E	EAS_ERR_LICENSE_HAS_EXPIRED 	License has expired
+1000E	EAS_ERR_UNHANDLED_DATABASE_ERROR    	Unhandled Database Error '{0}'
+1001E	EAS_ERR_CRITICAL_DATABASE_ERROR    	Critical Database Error '{0}'
+1002E	EAS_ERR_DATABASE_MEMORY_ERROR     	Database Memory Error '{0}'
+1003E	EAS_ERR_TABLE_SPACE_OR_LOG_VIOLATION	Table Space or Log Violation '{0}'
+1004E	EAS_ERR_RESOURCE_CONTENTION       	Resource Contention '{0}'
+1005E	EAS_ERR_USER_DEFINED_PROC_ERROR     	User Defined Procedure or Function Error '{0}'
+1006E	EAS_ERR_DATABASE_CONNECTION_FAILURE	Database Connection Failure '{0}'
+1007E	EAS_ERR_DATABASE_CONNECTION_LOST     	Database Connection Lost '{0}'
+1008E	EAS_ERR_DEADLOCK_ERROR             	Deadlock Error '{0}'
+1009E	EAS_ERR_INSUFFICIENT_PERMISSIONS	Insufficient Permissions '{0}'
+1010E	EAS_ERR_TRANSACTION_ERROR         	Transaction Error '{0}'
+1011E	EAS_ERR_UNIQUE_CONSTRAINT_VIOLATION 	Unique Constraint Violation '{0}'
+1012E	EAS_ERR_CONSTRAINT_VIOLATION        	Constraint Violation '{0}'
+1013E	EAS_ERR_SYNTAX_ERROR              	Syntax Error '{0}'
+1014E	EAS_ERR_CURSOR_ERROR               	Cursor Error '{0}'
+1015E	EAS_ERR_DATATYPE_ERROR               	Data Type Error '{0}'
+1020E	EAS_ERR_LANG_ERROR	Wrong $LANG definition: {0}
+1810E	EAS_ERR_STOP_DUE_TO_UMF_EXCEPTIONS 	Stopping Due to UMF Exceptions.
+1815E	EAS_ERR_NO_DRIVER_FOR_ADDRESS_STANDARDIZER_URL	No driver for address standardizer url[{0}]
+1816E	EAS_ERR_NO_DRIVER_FOR_CME_SOURCE_URL	No driver for cme source url [{0}]
+1817E	EAS_ERR_NO_DRIVER_FOR_URL	No driver for url [{0}]
+1818E	EAS_ERR_DQM_ERROR 	DQM Error processing message
+1819E	EAS_ERR_CME_NODE_INIT_FAIL 	CME Node Initialization Failed
+7101E	EAS_ERR_Q_UNHANDLED_EXCEPTION 	Unhandled exception in queue object
+7102E	EAS_ERR_Q_LOOKUP_FAILURE 	Could not look up queue, please make certain MSMQ is enabled on this node.
+7103E	EAS_ERR_Q_INVALID_LABEL 	Invalid Queue Label.
+7104E	EAS_ERR_Q_NAME_DOESNT_EXIST	Queue Name {0} does not exist
+7105E	EAS_ERR_Q_LABEL_NAME_CONVERSION_FAILURE	Failed to convert queue label name [{0}]
+7106E	EAS_ERR_Q_FUNC_FIND_FAIL	Failed to find function: {0}
+7106E	EAS_ERR_Q_MODULE_LOAD_FAIL 	Failed to load MQM module {0}
+7201E	EAS_ERR_INVALID_COLUMN_NAME          	Invalid column name
+7205E	EAS_ERR_DB_TABLE_INFO	Cannot retrieve table info for table [{0}]
+7207E	EAS_ERR_DB_BAD_MSSQL_VER             	Unsupported MSSQL Version
+7208E	EAS_ERR_DB_CREATE_ON_INVALID_CONN    	Can't create statement on invalid connection.
+7209E	EAS_ERR_DB_BAD_BACKEND_TYPE          	Invalid [SQL] Backend Parameter. Valid values are SQL or HYBRID
+7210E	EAS_ERR_DB_CANNOT_SHARD_CONFIG	Config tables cannot be configured to be sharded. TABLE[{0}]
+7211E	EAS_ERR_DB_BAD_CLUSTER_SIZE	Cluster [{0}] is configured with an invalid size. Size must be greater than zero
+7212E	EAS_ERR_DB_BAD_CLUSTER_NODE	Cluster [{0}] Node [{1}] is not configured.
+7213E	EAS_ERR_DB_NO_SCHEMA_SPECIFIED       	A schema name must be specified when using a MySQL database.
+7214E	EAS_ERR_DB_UNABLE_TO_FIND_CONFIG_VERSION 	Unable to find Configuration Version.
+7215E	EAS_ERR_DB_UNABLE_TO_INC_CONFIG_VERSION 	Unable to increment Configuration Version following configuration change.
+7216E	EAS_ERR_DB_BAD_CLUSTER_DEFINITION	Cluster [{0}] is not properly configured
+7217E	EAS_ERR_DB_CONFLICTING_DEFAULT_SHARD_CONFIG 	Cannot specify both default backend database and default backend cluster
+7218E	EAS_ERR_DB_CLUSTER_DOES_NOT_EXIST	Cluster [{0}] does not exist
+7219E	EAS_ERR_ENGINE_CONFIGURATION_DOES_NOT_MATCH	Engine configuration '{0}' does not match '{1}'
+7220E	EAS_ERR_NO_CONFIG_REGISTERED_IN_DATASTORE   	No engine configuration registered.
+7221E	EAS_ERR_NO_CONFIG_REGISTERED_FOR_DATA_ID	No engine configuration registered with data ID [{0}].
+7222E	EAS_ERR_FAILED_TO_SET_SYS_VAR_IN_DATASTORE	Could not set system variable value in database for Group[{0}],Code[{1}],Value[{2}].
+7223E	EAS_ERR_INVALID_SCHEMA_VERSION_IN_DATASTORE	Invalid version number for datastore schema [version '{0}'].
+7224E	EAS_ERR_INVALID_SCHEMA_VERSION_IN_ENGINE	Invalid version number for engine schema [version '{0}'].
+7225E	EAS_ERR_INVALID_MININUM_DATASTORE_SCHEMA_VERSION	Invalid minimum datastore version number for engine schema [version '{0}'].
+7226E	EAS_ERR_INCOMPATIBLE_DATASTORE_SCHEMA_VERSION	Incompatible datastore schema version: [Engine version '{0}'.  Datastore version '{1}' is installed but minimum of '{2}' is required.]
+7227E	EAS_ERR_CONFLICTING_SCHEMA_VERSIONS_IN_DATASTORE	Conflicting version numbers for datastore schema [{0}].
+7228E	EAS_ERR_INVALID_SCHEMA_VERSION	Invalid schema version number [version '{0}'].
+9106E	EAS_ERR_FAILED_TO_OPEN_INITIALIZATION_FILE	Failed to open initialization file [{0}]
+9107E	EAS_ERR_CANT_GET_PARAMETER_FROM_THE_STORE	Cannot get parameter [{0}] from parameter store
+9108E	EAS_ERR_INI_VALUE_MUST_BE_OF_TYPE	The ini file value for [{0}] needs to be {1}
+9109E	EAS_ERR_CORRUPT_CONFIG_FILE 	Corrupt configuration file.
+9110E	EAS_ERR_INSUFFICIENT_CONFIG	Insufficient configuration for the {0} table!
+9111E	EAS_ERR_PARSE_FRAGMENT	ERROR parsing FragmentID[{0}] FragmentName[{1}] : [{2}] is an invalid RuleID dependency
+9112E	EAS_ERR_FAILED_TO_OPEN_INI_FILE_FOR_WRITING	Failed to open ini file for writing [{0}]
+9113E	EAS_ERR_FAILED_TO_OPEN_INI_FILE_FOR_READING	Failed to open ini file for reading [{0}]
+9205E	EAS_ERR_STAT_CANT_OPEN_FILE_FOR_WRITE 	Can't open shared file for statistics writing.
+9206E	EAS_ERR_STAT_CANT_OPEN_SHM_FILE_FOR_WRITE 	Can't open shared file
+9114E	EAS_ERR_FAILED_TO_READ_DATA_FROM_CONFIGURATION_FILE	Failed to read data from configuration file [{0}]
+9115E	EAS_ERR_INPUT_NOT_STANDARDIZED 	Cannot process Observation that has not been standardized
+9116E	EAS_ERR_CONFIG_TABLE_NOT_FOUND	CONFIG information for {0} not found!
+9117E	EAS_ERR_CONFIG_TABLE_COLUMN_NOT_FOUND	CONFIG information for {0} not found in {1}!
+9118E	EAS_ERR_CONFIG_TABLE_COLUMN_INDEX_NOT_FOUND	Invalid column index {0} queried from {1} container!
+9118E	EAS_ERR_CONFIG_TABLE_COLUMN_NAME_NOT_FOUND	Invalid column name {0} queried from {1} container!
+9207E	EAS_ERR_SALT_VALUE_ALREADY_EXISTS 	A salt value already exists and cannot be generated.
+9208E	EAS_ERR_CONTEXT_INIT_FAILED 	Unable to initialize ICC Context.
+9209E	EAS_ERR_CONTEXT_ERROR	ICC Context Error [{0}]
+9210E	EAS_ERR_DIGEST_CONTEXT_INIT_FAILED 	Unable to initialize Digest Context.
+9211E	EAS_ERR_ENCODE_CONTEXT_INIT_FAILED 	Unable to initialize Encoding Context.
+9212E	EAS_ERR_CANNOT_OBTAIN_STATUS 	Unable to obtain ICC status.
+9213E	EAS_ERR_CANNOT_CREATE_HASHER 	Unable to generate hashed data due to missing or invalid salt value.
+9214E	EAS_ERR_MISSING_CHECKSUM 	The Salt Checksum is not present in the repository.
+9215E	EAS_ERR_UNABLE_TO_ALLOCATE_MEMORY 	Unable to allocate memory.
+9216E	EAS_ERR_MISSING_SALT 	Unable to locate Salt value.
+9217E	EAS_ERR_INVALID_SALT 	Salt value provided is invalid.
+9218E	EAS_ERR_UNABLE_TO_GENERATE_DIGEST 	Unable to generate Message Digest.
+9219E	EAS_ERR_UNABLE_TO_GENERATE_SALT 	Unable to generate Salt Value.
+9220E	EAS_ERR_FTYPE_CANNOT_BE_HASHED	FType configured to be hashed, but cannot be scored.  FTYPE_ID[{0}] FTYPE_CODE[{1}]
+9222E	EAS_ERR_FTYPE_CONFIGURED_TO_BE_HASHED_MISSING_SALT	A Feature Type is marked for hashing, but a valid salt value was not found.  FTYPE_ID[{0}] FTYPE_CODE[{1}]
+9223E	EAS_ERR_ENCODE_DECODE_FAILED 	Encoding/decoding failed
+9224E	EAS_ERR_FTYPE_CONFIGURED_TO_BE_HASHED	FType configured to be hashed, but no hashable data found.  FTYPE_ID[{0}] FTYPE_CODE[{1}]
+9225E	EAS_ERR_CANNOT_GET_G2CORE_INSTANCE 	Invalid instance returned by G2Core::GetInstance
+9226E	EAS_ERR_SALT_ALREADY_USED 	Observation has already been hashed with current salt
+9227E	EAS_ERR_SALT_CHECKUMS_LIST_EMPTY 	Salted check sum list empty !!!
+9228E	EAS_ERR_UNEXPECTED_SALT_CHECKUM_LIST	The SALT checksum on the Observation does not match the EXPECTED SALT checksum: EXPECTED=[{0}] Observation=[{1}]
+9240E	EAS_ERR_CIPHER_CONTEXT_INIT_FAILED 	Unable to initialize an ICC Context.
+9241E	EAS_ERR_CIPHER_OP_FAILED 	Unable to perform a required ICC operation.
+9250E	EAS_ERR_G2SS_INVALID_LIB	Invalid
+9251E	EAS_ERR_G2SS_INVALID_URL	Invalid Secure Store URL: {0}
+9252E	EAS_ERR_G2SS_INVALID_PIN	Invalid Secure Store credential specification: {0}
+9253E	EAS_ERR_G2SS_TOKEN_INIT_FAILED	Secure Store token initialization failed: {0}.
+9254E	EAS_ERR_G2SS_TOKEN_UNINITIALISED 	Cannot open a Secure Store session when the token is uninitialized.
+9255E	EAS_ERR_G2SS_USER_PIN_UNINITIALISED 	Secure Store credential is uninitialized.
+9256E	EAS_ERR_G2SS_SESSION_OPEN 	Cannot open a Secure Store session when one is already open.
+9257E	EAS_ERR_G2SS_NO_SESSION 	Cannot use Secure Store without a session.
+9258E	EAS_ERR_G2SS_SESSION_OPEN_FAILED	Secure Store session could not be opened: {0}.
+9259E	EAS_ERR_G2SS_ADMIN_LOGIN_FAILED	Secure Store admin login failed: {0}.
+9260E	EAS_ERR_G2SS_USER_LOGIN_FAILED	Secure Store user login failed: {0}.
+9261E	EAS_ERR_G2SS_PKCS11_ERROR	Secure Store function failed: {0}
+9262E	EAS_ERR_G2SS_NOT_PKCS11 	Secure Store library appears to be corrupted.
+9263I	EAS_ERR_G2SS_CLOSE	Secure Store closed
+9264E	EAS_ERR_G2SS_LOGOUT_FAILED	Secure Store logout failed: {0}.
+9265E	EAS_ERR_G2SS_NEED_RW_SESSION 	Secure Store session must be read/write.
+9266E	EAS_ERR_G2SS_UNABLE_TO_VERIFY_KEY 	Secure Store key does not meet requirements.
+9267E	EAS_ERR_G2SS_UNABLE_TO_CREATE_KEY 	Secure Store key creation failed.
+9268E	EAS_ERR_G2SS_UNABLE_TO_CHANGE_PIN	Secure Store password change failed: {0}.
+9269E	EAS_ERR_G2SS_INVALID_OLD_CREDENTIAL 	Secure Store old credential is invalid.
+9270E	EAS_ERR_G2SS_INVALID_NEW_CREDENTIAL 	Secure Store new credential is invalid.
+9271E	EAS_ERR_G2SS_OUT_OF_MEMORY 	Secure Store out of memory.
+9272E	EAS_ERR_G2SS_FIND_INIT_FAILED	Secure Store object locating failed: {0}.
+9273E	EAS_ERR_G2SS_FIND_FAILED	Secure Store object find failed: {0}.
+9274E	EAS_ERR_G2SS_CRYPTO_SETUP_FAILED	Secure Store setup of encryption failed: {0}.
+9275E	EAS_ERR_G2SS_ENCRYPT_START_FAILED	Secure Store unable to start encryption: {0}.
+9276E	EAS_ERR_G2SS_ENCRYPT_SIZE_FAILED	Secure Store unable to get the size of encrypted data: {0}.
+9277E	EAS_ERR_G2SS_ENCRYPT_FAILED	Secure Store encryption failed: {0}.
+9278E	EAS_ERR_G2SS_DECRYPT_START_FAILED	Secure Store unable to start decryption: {0}.
+9279E	EAS_ERR_G2SS_DECRYPT_FAILED	Secure Store decryption failed: {0}.
+9280E	EAS_ERR_G2SS_OBJECT_SAVE_FAILED	Secure Store unable to save object: {0}.
+9281E	EAS_ERR_G2SS_OBJECT_DELETE_FAILED	Secure Store unable to delete object: {0}.
+9282E	EAS_ERR_G2SS_OBJECT_CHANGE_FAILED	Secure Store unable to modify object: {0}.
+9283E	EAS_ERR_G2SS_UNINITIALISED 	Secure Store has not been initialized
+9284E	EAS_ERR_G2SS_INVALID_SLOT_ID	Can not obtain info on specified slot. Possibly invalid slot ID specified in Secure Store URL: {0}
+9285E	EAS_ERR_G2SS_NO_TOKEN_IN_SLOT	No security token present in slot specified by Secure Store URL: slot ID = {0}
+9286E	EAS_ERR_G2SS_TOKEN_NOT_FOUND	Can not obtain info for security token. Possibly invalid token label and/or slot ID specified in Secure Store URL: {0}
+9287E	EAS_ERR_G2SS_TOKEN_IMPL_ERROR	An internal error occurred in the security token implementation library: Return Code = {0}
+9288E	EAS_ERR_G2SS_USER_PIN_PROMPT_FAILED 	Was unable to prompt user for security token authentication.
+9289E	EAS_ERR_G2SS_LABEL_CHANGED_SINCE_CONFIG_INIT 	Secure Store has been reconfigured since loading.
+9290E	EAS_ERR_G2SS_OBJECT_NOT_FOUND	Secure Store does not have an object called {0}.
+9291E	EAS_ERR_G2SS_OBJECT_NAME_TOO_LONG	Secure Store does not not allow an object name as long as '{0}'.
+9292E	EAS_ERR_G2SS_NO_PASSWORD 	No password supplied
+9293E	EAS_ERR_G2SS_NO_SEC_STORE_PREFIX	Secure Store expects a different format
+9294E	EAS_ERR_G2SS_SEC_STORE_VALUE_BAD 	The exported value appears to be corrupted
+9295E	EAS_ERR_G2SS_NO_DATA_OBJECTS 	There are no Secure Store objects stored on the token
+9296E	EAS_ERR_G2SS_SEC_STORE_ARCHIVE_BAD	The exported archive appears to be corrupted around object {0}
+9297E	EAS_ERR_G2SS_FILE_NOT_FOUND	Secure Store failed to open {0}
+9298E	EAS_ERR_G2SS_FILE_CONTENTS_BAD	Secure Store contents of {0} not usable.
+9299E	EAS_ERR_G2SS_CLASS_NOT_INIT 	Secure Store internal error.
+9300E	EAS_ERR_G2SS_PASSWORD_CHECK_ERROR	Secure Store internal error
+9301E	EAS_ERR_MISSING_SEQUENCE_ENTRY	Missing Sequence Entry[{0}] in the SYSTEM_SEQUENCE table!
+9305E	EAS_ERR_SEQUENCE_RETRIES_FAILED	Retries failed to retrieve Sequence Entry[{0}] in the SYSTEM_SEQUENCE table!  This may mean the CACHE_SIZE is too small.
+9306E	EAS_ERR_SEQUENCE_CACHE_SIZE_INVALID	Cache size [{1}] for Sequence [{0}] is invalid.
+9307E	EAS_ERR_SEQUENCE_DB_TYPE_INVALID	Sequence counting is not supported on database type [{0}]
+9308E	EAS_ERR_MISSING_STATUS_ENTRY	Could not retrieve status entry[{0}] in the SYS_STATUS table!
+9309E	EAS_ERR_SEQUENCE_HAS_BEEN_RESET	Sequence entry[{0}] has been reset.
+9310E	EAS_ERR_INVALID_STATUS_ENTRY_VALUE	Invalid value for status entry[{0}] in the SYS_STATUS table!
+9401E	EAS_ERR_G2SS_INVALID_TIMEOUT	Secure Store expects a number for timeout: {0}.
+9402E	EAS_ERR_G2SS_INVALID_MUTEX_NAME	Secure Store cannot
+9403E	EAS_ERR_G2SS_MUTEX_WAIT_FAILED	Secure Store failure
+9404E	EAS_ERR_G2SS_MUTEX_TIME_ERROR	Secure Store error
+9405E	EAS_ERR_G2SS_MUTEX_RELEASE_FAILED	Secure Store failure
+9406E	EAS_ERR_G2SS_SESSION_MUST_NOT_BE_OPEN 	Secure Store cannot fetch a value with sync if a session is already open.
+9407E	EAS_ERR_G2SS_MUTEX_MUST_BE_ACQUIRED 	Secure Store must acquire the mutex before synchronized get.
+9408E	EAS_ERR_G2SS_PASSWORD_INADEQUATE	The provided password is not strong enough: {0}
+9409E	EAS_ERR_G2SS_FUNCTION_LIST_NOT_SET 	The security token interface is not yet set
+9410E	EAS_ERR_G2SS_PKCS_INIT_FAILED	Initializing token driver failed {0}
+9411E	EAS_ERR_G2SS_PKCS_FINAL_FAILED	Finalizing token driver failed {0}
+9412E	EAS_ERR_G2SS_MUTEX_ACQUIRE_FAILED 	Secure Store was unable to acquire mutex
+9413E	EAS_ERR_G2SS_INCORRECT_PASSWORD 	The export file password appears to be incorrect.
+9501E	EAS_ERR_FAILED_TO_CONVERT_TO_UTF8	Failed to convert message to UTF-8 [{0}]
+9502E	EAS_ERR_FAILED_TO_CONVERT_FROM_UTF8	Failed to convert data from UTF-8 with error: [{0}]
+9503E	EAS_ERR_UTF8_CONVERTER_OPENING_FAILURE	Failed to open UTF-8 converter [{0}]
+9601E	EAS_ERR_CNT_HANDLED_BY_TWO_TRANSPORTS	File {0} being handled by two transports.
+9602E	EAS_ERR_CANT_INCREASE_UNREGISTERED_COUNT_FILE	Transport processing {0} tried to increase count file without registering the file with the count file handler.
+9603E	EAS_ERR_CANT_DECREASE_COUNT_FILE	Transport processing {0} tried to decrease count file.
+9604E	EAS_ERR_CANT_OPEN_COUNT_FILE_TO_WRITE	Can't open existing count file '{0}' for write.  Please check the permissions of this file and ensure it can be written to by this user.
+9605E	EAS_ERR_CANT_CREATE_COUNT_FILE	Can't create new count file '{0}'.  Please check the permissions of the directory and ensure it can be written to by this user. 
+9606E	EAS_ERR_OMITTED_UNFINISHED_FILE_DURING_RESTART	Unfinished file '{0}' was listed in the count file, but omitted during restart. Please check that all unfinished files are handled by a transport.
+9607E	EAS_ERR_COUNT_FILE_DATAFILE_DOES_NOT_MATCH_REQUESTED_DATAFILE	Count file datafile
+9608E	EAS_ERR_CANT_OPEN_COUNT_FILE_FOR_READ	Can't open count file '{0}' for read. Please check that the file exists and the permissions of this file and ensure it can be read by this user.
+9701E	EAS_ERR_CANT_RETRIEVE_INDEX_FROM_MEMORY_ROW	Cannot retrieve index[{0}] from memory row of key[{1}], out of range!
+9703E	EAS_ERR_MEMTBL_COL_INDEX_TOO_BIG 	Current field in memory row is passed end of row
+7301E	EAS_ERR_ANOTHER_APPLICATION_IS_BOUND_TO_PORT	Another application is already bound to port
+7302E	EAS_ERR_FAILED_TO_SEND	Failed to send {0}.
+7303E	EAS_ERR_MANDATORY_SEGMENT_WITH_MISSING_REQUIREMENTS	Mandatory segment with missing requirements:
+7304E	EAS_ERR_MISSING_XML_NODE 	Null xml node found
+7305E	EAS_ERR_MISSING_JSON_ROOT_ELEMENT 	No root element name in json TEMPLATE
+7306E	EAS_ERR_XML_CONFIG_ERROR 	Config error: Missing /*/TEMPLATE
+7307E	EAS_ERR_PARSER_ZERO_THREAD_COUNT 	Thread count 0 for parser.
+7308E	EAS_ERR_XML_GENERATION_FAILED 	XML generation failed
+7309E	EAS_ERR_NO_FIELDS_IN_XML_TEMPLATE 	No fields found in XML template
+7310E	EAS_ERR_BAD_ID_OUTSIDE_COMMIT_WINDOW	Bad ID {0}. Outside of commit window, [{1} ..  {2}]
+7311E	EAS_ERR_FAILED_TO_OPEN_CONVERTER	Failed to open converter [{0}]
+7312E	EAS_ERR_FAILED_TO_OPEN	Failed to open [{0}]
+7313E	EAS_ERR_MANDATORY_ELEMENT_WITH_MISSING_FIELD	Mandatory element with missing field: {0}
+7314E	EAS_ERR_MANDATORY_ELEMENT_WITH_EMPTY_FIELD	Mandatory element with empty field: {0}
+7315E	EAS_ERR_RECORD_TOO_SHORT	Record too short: [{0}]
+7316E	EAS_ERR_INVALID_FIELD	Invalid Field, {0}: {1}
+7317E	EAS_ERR_FAILED_TO_OPEN_FILE	Failed to open file: {0}
+7318E	EAS_ERR_FAILED_TO_PARSE	Failed to parse {0}
+7319E	EAS_ERR_FAILED_TO_OPEN_FOR_WRITE	Failed to open {0} for write
+7321E	EAS_ERR_UMF_MESSAGE_PROCESSED_WITH_FATAL_ERROR 	UMF message processed with FATAL error returned.
+7322E	EAS_ERR_UMF_MESSAGE_PROCESSED_WITH_UNKNOWN_ERROR	UMF message processed with unknown error returned {0}.
+7323E	EAS_ERR_UNKNOWN_ERROR_READING_SOURCE 	Unknown error when reading from source.
+7424E	EAS_ERR_XLITERATOR_INIT_FAILED 	Transliterator initialization failed
+7325E	EAS_ERR_FILENAME_TOO_LONG	Filename [{0}] exceeds maximum OS limit [{1}]
+7426E	EAS_ERR_XLITERATOR_FAILED 	Transliteration failed
+7330E	EAS_ERR_MAPPING_FILE_NOT_SPECIFIED 	CSV file type specified, but no mapping file was specified. Mapping file must be specified.
+7331E	EAS_ERROR_UNABLE_TO_OPEN_MAPPING_FILE	Failed to open mapping file [{0}]
+7332E	EAS_ERROR_UNABLE_TO_READ_MAPPING_FILE	Failed to read mapping file [{0}], inner exception [{1}]
+7333E	EAS_ERROR_MAPPING_FILE_IS_MALFORMED	Problem loading mapping file into XML document. Mapping file [{0}] - File is malformed.
+7334E	EAS_ERR_PARSING_CONVERTED_CSV_RECORD	Error parsing converted CSV document into XML. Document text: [{0}]
+7335E	EAS_ERR_UNABLE_TO_FIND_COLUMNS_NODE_IN_CSV_MAPPING_FILE 	Cannot locate <COLUMNS> node in CSV mapping file. Check mapping file.
+7336E	EAS_ERR_CSV_TO_UMF_CONVERTER_NOT_INITIALIZED 	Attempt to use CSVToUMFConverter without initializing it.
+7337E	EAS_ERR_CSV_HEADER_FIELD_COUNT_MISMATCH	The number of fields in the CSV header [{0}] does not match the count specified in the mapping file [{1}]
+7338E	EAS_ERR_CSV_HEADER_FIELD_NAME_MISMATCH	Name of field [{0}, {1}] in the CSV header does not match the name specified in the mapping file [{2}]
+7339E	EAS_WRN_CSV_MAPFILE_COLUMN_COUNT_MISMATCH	The actual number of columns in the data row [{0}] doesn't match the number specified in the mapping file [{1}]. Record rejected.
+7340E	EAS_WRN_CSV_UMFDOC_COLUMN_COUNT_MISMATCH	There were fewer columns in the data record [{0}] than required by the UMF_DOC template. [{1}]
+7341E	EAS_ERR_FAILED_TO_OPEN_CSV_BAD_RECORD_FILE	Unable to open the CSV bad record file [{0}]
+7342E	EAS_ERR_MAPPING_FILE_SPECIFIED_WITHOUT_FILETYPE	The mapping file [{0}] was specified, but no file type was specified.
+7343E	EAS_ERR_FILETYPE_SPECIFIED_WITHOUT_MAPPING_FILE	The file type [{0}] was specified, but no mapping file was specified.
+7344E	EAS_ERR_UNKNOWN_MAPPING_DIRECTIVE	Invalid mapping directive [{0}] for attribute [{1}].
+2000E	EAS_ERR_REQUESTED_CONFIG_FOR_INVALID_ETYPE_CODE	Requested config for invalid ETYPE_CODE[{0}]
+2001E	EAS_ERR_FEATURE_HAS_NO_FTYPE_CODE	Cannot process feature with no FTYPE_CODE[{0}]
+2002E	EAS_ERR_REQUESTED_CONFIG_FOR_INVALID_FTYPE_CODE	Requested config for invalid FTYPE_CODE[{0}]
+2003E	EAS_ERR_NO_FELEM_CODE	Cannot process OBS_FELEM with no FELEM_CODE[{0}]
+2004W	EAS_WRN_FELEM_CODE_BUT_NO_VALUE	OBS_FELEM has FELEM_CODE but no FELEM_VALUE[{0}]
+2005E	EAS_ERR_INVALID_FELEM_CODE	FELEM_CODE[{0}] is not configured for FTYPE_CODE[{1}]
+2006E	EAS_ERR_MISSING_ENT_SRC_KEY 	OBS_ENT is missing ENT_SRC_KEY
+2007E	EAS_ERR_MISSING_OBS_SRC_KEY 	OBS is missing OBS_SRC_KEY
+2008W	EAS_WRN_FEATURE_HAS_NO_FELEM	Cannot process feature with no elements[{0}]
+2009W	EAS_WRN_NO_GROUPER_FEATS	ENT_SRC_KEY[{0}] has no grouper features
+2010E	EAS_ERR_GROUPER_KEY_MATCH_HAS_MULTIPLE_CANDIDATES	Grouper Key Matching has resulted in [{0}] candidates, but only 1 RES_ENT found
+2011E	EAS_ERR_GROUPER_KEY_ENABLED_BUT_NOT_CONFIGURED_TO_RESOLVE	Grouper Key Clustering is Enabled, but RULE_ID [{0}] is not configured to resolve.
+2012E	EAS_ERR_ERRULE_CONFIGURED_FOR_RESOLVE_AND_RELATE	ER Rule [{0}] is configured for both resolve and relate.
+2013E	EAS_ERR_GROUPER_KEY_NOT_CONFIGURED  	A GROUPER_KEY ER Rule is required to be configured in CFG_ERRULE.
+2014E	EAS_ERR_REQUESTED_CONFIG_FOR_INVALID_UTYPE_CODE	Requested config for invalid UTYPE_CODE[{0}]
+2015E	EAS_ERR_INVALID_FTYPE_CODE	Invalid FTYPE_CODE[{0}]
+2026E	EAS_ERR_BAD_GROUPER_PARSE	Error parsing RS, ES values from grouper key.  LIB_EFEAT_ID[{0}] value[{1}]
+2027E	EAS_ERR_PLUGIN_INIT	Plugin initialization error {0}
+2028E	EAS_ERR_PLUGIN_SCORING	[{0}] Plug-in encountered the following error while scoring {1}
+2029E	EAS_ERR_REQUESTED_CONFIG_FOR_INVALID_PLUGIN	Configuration not found for plugin type: {0}
+2030E	EAS_ERR_PLUGIN_VERSION	Library [{0}] version [{1}] is older than configured version [{2}]
+2031E	EAS_ERR_PLUGIN_TYPE	Library [{0}] is of type [{1}] but is configured as type [{2}]
+2032E	EAS_ERR_REQUESTED_ECLASS_FOR_INVALID_ETYPE	requested invalid EType ID [{0}]
+2033E	EAS_ERR_ETYPE_CONFIGURED_WITH_INVALID_ECLASS	EType configured with invalid EClass ID ETYPE_ID[{0}] ECLASS_ID[{1}]
+2034E	EAS_ERR_INVALID_CFRTN_VAL	CFRTN_ID[{0}] is expecting CFRTN_VAL[{1}] which is not offered by CFUNC_ID[{2}][{3}]. Available scores are [{4}]
+2035E	EAS_ERR_INVALID_CFRTN_CFUNC	CFRTN_ID[{0}] is expecting configuration for CFUNC_ID[{1}] which cannot be found
+2036E	EAS_ERR_FTYPE_HAS_NO_BOM	FType configured with no Feature Elements
+2037E	EAS_ERR_FUNC_CALL_HAS_NO_BOM	Function call
+2131E	EAS_ERR_OBS_ENT_NOT_FOUND	Requested resolution of OBS_ENT_ID that is not loaded OBS_ENT_ID[{0}]
+2135E	EAS_ERR_UMF_MAPPING_CONFIG_ERROR	Error in UMF Mapping Config[{0}]
+2136E	EAS_ERR_UMF_MAPPING_MISSING_REQUIRED_FIELD	Error in UMF Mapping, missing required field[{0}]
+2137E	EAS_ERR_UMF_MAPPING_MALFORMED_INPUT	Error in UMF Mapping, input message is malformed[{0}]
+2138E	EAS_ERR_INVALID_CFRTN_INDEX	CFRTN_ID[{0}] is out of range. Valid range is 0-7
+2039E	EAS_ERR_PLUGIN_RELATIONSHIP	[{0}] Plug-in encountered the following error while relationship_scoring {1}
+2040E	EAS_ERR_UNCONFIGURED_FELEM	LIB_FEAT_ID[{0}] contains a feature element of FELEM_ID[{1}] which is unconfigured
+2041E	EAS_ERR_EFCALL_HAS_NO_BOM	EFeature creation call configured with no Bill of Materials  EFCALL_ID[{0}]
+2042E	EAS_ERR_PLUGIN_BUILDER	[{0}] Plug-in encountered the following error while building output messages: {1}
+2043E	EAS_ERR_PLUGIN_EFEAT_CREATOR	[{0}] Plug-in encountered the following error while creating efeatures {1}
+2044E	EAS_ERR_STD_RETURN_DOC	[{0}] Standardization Plug-in did not return a valid document {1}
+2045E	EAS_ERR_CFRTN_REFERS_BAD_CFUNC_ID	CFRTN_ID[{0}] references CFUNC_ID[{1}] which is not configured
+2047E	EAS_ERR_MISSING_DSRC_CODE	OBS_SRC_KEY[{0}] is missing DSRC_CODE tag which is required
+2048E	EAS_ERR_FEAT_FREQ_INVALID	FEATURE CODE[{0}] FEATURE FREQUENCY[{1}] is an invalid frequency
+2048E	EAS_ERR_FEAT_OVERRIDE_FREQ_INVALID	FEATURE BEHAVIOR OVERRIDE FREQUENCY[{0}] is an invalid frequency
+2049E	EAS_ERR_FUNC_INVALID	{2} [{0}] is invalid for {3}[{1}]
+2050E	EAS_ERR_QUAL_FRAG_NOT_FOUND	Rule[{0}] Qualifier Fragment[{1}]: Fragment not found
+2051E	EAS_ERR_DISQUAL_FRAG_NOT_FOUND	Rule[{0}] Disqualifier Fragment[{1}]: Fragment not found
+2052E	EAS_ERR_XPATH_FRAG_ERR	XPath evaluation error when evaluating Fragment ID[{0}] NAME[{1}]
+2053E	EAS_ERR_XPATH_FRAG_NULL	Fragment ID[{0}] NAME[{1}] evaluation returned NULL result.
+2054E	EAS_ERR_XPATH_FRAG_BAD_TYPE 	Fragment evaluation returned invalid result type.  Valid types are BOOL, NUMBER, and NODESET
+2055E	EAS_ERR_SUMMARY_MISSING_SCORE	Summary configuration references score that does not exist FEATURE_CODE[{0}] SCORE[{1}]
+2056E	EAS_ERR_SUMMARY_EMPTY_SCORE	Summary configuration references score that is not being populated FEATURE_CODE[{0}] SCORE[{1}] VALUE[{2}]
+2057E	EAS_ERR_BAD_DSRC_ACTION	OBS_SRC_KEY[{0}] has DSRC_ACTION[{1}] which is invalid.  Valid values are [A]dd, [C]hange, [D]elete, [P]rune or E[X]tensive Evaluation
+2058E	EAS_ERR_INHERIT_MISSING_LENS 	OBS_ENT INHERIT TAG IS MISSING REQUIRED LENS_ID TAG
+2059E	EAS_ERR_INHERIT_MISSING_RES_ENT_ID 	OBS_ENT INHERIT TAG IS MISSING REQUIRED RES_ENT_ID TAG
+2060E	EAS_ERR_INHERIT_MULTIPLE 	OBS_ENT HAS MULTIPLE INHERIT TAGS.  ONLY ONE IS ALLOWED
+2061E	EAS_ERR_DUPLICATE_LOOKUP_IDENTIFIER	Duplicate [{0}] with identifier value [{1}].  Only unique values are allowed.
+2062E	EAS_ERR_INVALID_LOOKUP_IDENTIFIER	Requested lookup of [{0}] using unknown value [{1}].  Value not found.
+2065E	EAS_ERR_FTYPE_HAS_MULTIPLE_DEFINITIONS	FType configured with multiple definitions. FTYPE_CODE[{0}] used in FTYPE_ID[{1}] and FTYPE_ID[{2}]
+2066E	EAS_ERR_FELEM_HAS_MULTIPLE_DEFINITIONS	FElem configured with multiple definitions. FELEM_CODE[{0}] used in FELEM_ID[{1}] and FELEM_ID[{2}]
+2067E	EAS_ERR_ERFRAG_HAS_MULTIPLE_DEFINITIONS	ER Fragment code configured with multiple definitions. ERFRAG_CODE[{0}] used in ERFRAG_ID[{1}] and ERFRAG_ID[{2}]
+2068E	EAS_ERR_ER_RULE_NOT_FOUND	ER-Rule ID [{0}] referenced, but not found.
+2069E	EAS_ERR_BOM_CONFIG_INVALID_FOR_SIMPLE_PLUGIN	Configured plugin for CFCALL_ID[{0}] requires exactly one value in BOM
+2070E	EAS_ERR_EFCALL_HAS_INVALID_FUNCTION	EFeature creation call configured with invalid function ID EFCALL_ID[{0}] EFUNC_ID[{1}]
+2071E	EAS_ERR_EFBOM_HAS_INVALID_EFCALL	EFeature BOM configured with invalid EFCALL_ID[{0}]
+2072E	EAS_ERR_PLUGIN_STANDARDIZATION	[{0}] Standardization Plug-in encountered the following error while standardizing: [{1}]
+2073E	EAS_ERR_LOADING_LIBRARY	Library loading error {0}
+2074E	EAS_ERR_SCORING_MANAGER_PLUGIN	Scoring manager: id {0} and {1} do not match
+2075E	EAS_ERR_TABLE_CONFIGURED_WITH_INVALID_FTYPE_CODE	Table {0} configured with an invalid type FTYPE_CODE[{1}]
+2075E	EAS_ERR_TABLE_CONFIGURED_WITH_INVALID_FTYPE_ID	Table {0} configured with an invalid type FTYPE_ID[{1}]
+2076E	EAS_ERR_TABLE_CONFIGURED_WITH_INVALID_FELEM_CODE	Table {0} configured with an invalid type FELEM_CODE[{1}]
+2076E	EAS_ERR_TABLE_CONFIGURED_WITH_INVALID_FELEM_ID	Table {0} configured with an invalid type FELEM_ID[{1}]
+2077E	EAS_ERR_TABLE_CONFIGURED_WITH_INVALID_ETYPE_ID	Table {0} configured with an invalid type ETYPE_ID[{1}]
+2079E	EAS_ERR_EFBOM_CONFIGURED_WITH_INVALID_FTYPE_ID	CFG_EFBOM configured with an invalid type FTYPE_ID[{0}]
+2080E	EAS_ERR_EFBOM_CONFIGURED_WITH_INVALID_FELEM_ID	CFG_EFBOM configured with an invalid type FELEM_ID[{0}]
+2081E	EAS_ERR_FUNC_CALL_CONFIGURED_WITH_INVALID_FTYPE_ID	{1} configured with an invalid type FTYPE_ID[{0}]
+2082E	EAS_ERR_FUNC_CALL_CONFIGURED_WITH_INVALID_FUNC_ID	{1} configured with an invalid type {2}[{0}]
+2083E	EAS_ERR_FUNC_BOM_CONFIGURED_WITH_INVALID_FTYPE_ID	{1} configured with an invalid type FTYPE_ID[{0}]
+2084E	EAS_ERR_FUNC_BOM_CONFIGURED_WITH_INVALID_FELEM_ID	{1} configured with an invalid type FELEM_ID[{0}]
+2085E	EAS_ERR_TABLE_CONFIGURED_WITH_DUPLICATE_EXEC_ORDER_FOR_FTYPE_ID	Table [{0}] configured with duplicate execution order values for FTYPE_ID[{1}]
+2086E	EAS_ERR_TABLE_CONFIGURED_WITH_DUPLICATE_EXEC_ORDER_FOR_ETYPE_ID	Table [{0}] configured with duplicate execution order values for ETYPE_ID[{1}]
+2087E	EAS_ERR_TABLE_CONFIGURED_WITH_DUPLICATE_CONFIG_FOR_EFU_TYPE	Table [{0}] configured with duplicate config values for ETYPE_ID[{1}]/FTYPE_ID[{2}]/UTYPE_CODE[{3}]
+2088E	EAS_ERR_TABLE_CONFIGURED_WITH_INVALID_RCLASS_ID	Table {0} configured with an invalid RCLASS_ID[{1}]
+2089E	EAS_ERR_UNKNOWN_FCLASS_ID	UNKNOWN FCLASS ID[{0}]
+2090E	EAS_ERR_SFCALL_HAS_INVALID_FUNCTION	Feature standardization call configured with invalid function ID SFCALL_ID[{0}] SFUNC_ID[{1}]
+2091I	EAS_INF_OBS_ENT_ID_NOT_PROVIDED	Requested resolution without providing an OBS_ENT_ID
+2092E	EAS_ERR_SUMMARY_HAS_INVALID_BEHAVIOR	Summary configuration references behavior that does not exist FEATURE_CODE[{0}] BEHAVIOR[{1}]
+2093E	EAS_ERR_CFUNC_CONFIGURED_WITH_NO_CFRTN	CFG_CFUNC [{0}] configured without any corresponding return values in CFG_CFRTN
+2099E	EAS_ERR_COUNTER_CONFIG_INVALID_THRESHOLD	Next Threshold for a counter should be no less than 10, but has NEXT_THRESH{0}
+2100E	EAS_ERR_LIBFEAT_SCORED_UNCACHED	Feature is being scored but is not loaded: LIB_FEAT_ID[{0}]
+2101E	EAS_ERR_XPATH_OP_UNSUPPORTED	XPath operation unsupported [{0}]
+2102E	EAS_ERR_XPATH_AXIS_UNSUPPORTED	XPath axis unsupported [{0}]
+2103E	EAS_ERR_XPATH_TEST_UNSUPPORTED	XPath test unsupported [{0}]
+2104E	EAS_ERR_XPATH_TYPE_UNSUPPORTED	XPath type unsupported [{0}]
+2105E	EAS_ERR_XPATH_NODE_PREFIX_UNSUPPORTED	XPath node prefix unsupported [{0}]
+2106E	EAS_ERR_XPATH_NODE_NAME_UNSUPPORTED	XPath node name unsupported position[{0}], name[{1}]
+2107E	EAS_ERR_XPATH_BEHAVIOR_TYPE_UNSUPPORTED	XPath behavior type unsupported [{0}]
+2108E	EAS_ERR_XPATH_BUCKET_UNSUPPORTED	XPath bucket type unsupported [{0}]
+2109E	EAS_ERR_XPATH_VALUE_TYPE_UNSUPPORTED	XPath value type unsupported [{0}]
+2110E	EAS_ERR_XPATH_PLUS_TYPE_UNSUPPORTED	XPath plus operand type unsupported [{0}]
+2111E	EAS_ERR_XPATH_FRAGMENT_NOT_EVALUATED	XPath fragment not evaluated[{0}]
+2112E	EAS_ERR_XPATH_FRAGMENT_NOT_CONFIGURED	XPath fragment not configured[{0}]
+2113E	EAS_ERR_XPATH_FUNCTION_UNSUPPORTED	XPath function unsupported [{0}]
+2114E	EAS_ERR_INVALID_FTYPE_SCORESET	Cannot set score for invalid FTYPE_ID [{0}]
+2115I	EAS_INF_UNRESOLVE_ABORTED_TIME_EXCEEDED	Unresolve for entities aborted
+2116E	EAS_ERR_UNITIALIZED_AMBIGUOUS_CACHE	Uninitialized Ambiguous Test Cache
+7501E	EAS_ERR_ROUTER_OOM 	Out of memory allocating route
+7502E	EAS_ERR_ROUTER_NON_XML_MESSAGE_RECEIVED 	Message received which is not of XML format.
+7503E	EAS_ERR_FAILED_TO_OPEN_ROUTING_RULE_QUEUE	Failed to open routing rule queue - {0}
+7504E	EAS_ERR_INVALID_ROUTE_FILTER_FUNCTION	Invalid route filter function - {0}
+7505E	EAS_ERR_FAILED_TO_OPEN_ROUTE_INFO_STORAGE_FILE	Failed to open file {0} for storing route information.
+7507E	EAS_ERR_FAILED_TO_MATCH_XPATH	Failed to match XPath expression: {0}
+   E	EAS_ERR_CANT_OPEN_LOG_FILE	Failed to open log file: {0}
+   E	EAS_ERR_CANT_WRITE_TO_LOG_FILE	Failed to write to log file: {0}
+7205E	EAS_ERR_EXCEEDED_CONFIGURED_RETRIES 	Exceeded configured retries after deadlock or timeout
+7511E	EAS_ERR_ABORT_ER_AND_RETRY	Detected change in candidate entity[{0}].  Restarting ER evaluation.
+8000E	EAS_ERR_GNRNP 	GNR NameParser Failure
+7512E	EAS_ERR_MISSING_LIB_FEAT	Missing LIB_FEAT_ID[{0}].  Restarting ER evaluation.
+8301E	EAS_ERR_IS_INVALID_RESPONSE	Invalid response: [{0}]
+8302E	EAS_ERR_IS_CANT_CONNECT_SERVER	Cannot connect to InfoServer server: [{0}]
+8303E	EAS_ERR_IS_FAILURE_TO_CONNECT	Error, failure to connect to the server : [{0}][{1}]
+8304E	EAS_ERR_IS_NON_200_REPLY	Error, received error status code from server : {0}
+8305E	EAS_ERR_COULD_NOT_CREATE_HYDRA_TABLE_MAP	Error creating table map [{0}], received error status code from server : {1}
+8306E	EAS_ERR_COULD_NOT_INITIALIZE_HYDRA_TABLE_MAP	Error initializing table map [{0}].
+8401E	EAS_ERR_UNKNOWN_LENS_CODE	Unknown value of LENS_CODE [{0}].
+8402E	EAS_ERR_DEFAULT_LENS_ID_DOES_NOT_EXIST	The default lens ID [{0}] does not exist.
+8403E	EAS_ERR_ACCESS_UNKNOWN_LENS_ID	Tried to access unknown lens ID [{0}].  Identifier not found.
+8404E	EAS_ERR_CONFLICTING_ER_SPEC_FOR_LENS	Conflicting ER specification for lenses.
+8405E	EAS_ERR_MISSING_ER_SPEC_FOR_LENS_ID	Internal ER specification for lenses was not found.
+8406E	EAS_ERR_UNKNOWN_LENS_ID_FOR_ER_SESSION	Unknown lens [{0}] accessed by ER session.
+8407E	EAS_ERR_CANNOT_LOAD_RETENTION_MULTI_LENS	Cannot load with retention level 'FORGET' with multiple lenses.
+8408E	EAS_ERR_UNKNOWN_LENS_ID	Unknown value of LENS_ID [{0}].
+8409E	EAS_ERR_CANNOT_HAVE_LENSES_IN_PRUNE_OR_DEL	Cannot have lenses in an observation which will be deleted or pruned.
+8501E	EAS_ERR_SALT_DIGEST_ALGORITHM_NOT_AVAILABLE	Failed to get {0} digest algorithm from ICC.
+8502E	EAS_ERR_SALT_DIGEST_CONTEXT_CREATE_FAILED 	Failed to create a digest context.
+8503E	EAS_ERR_SALT_DIGEST_CONTEXT_INIT_FAILED	Failed {0} to initialise a digest context.
+8504E	EAS_ERR_SALT_DIGEST_FAILED	Failed {0} to digest block {1}.
+8505E	EAS_ERR_SALT_DIGEST_FINAL_FAILED	Failed {0} to complete digest.
+8506E	EAS_ERR_SALT_DIGEST_CONTEXT_CLEANUP_FAILED	Failed {0} to cleanup digest context.
+8507E	EAS_ERR_SALT_DIGEST_CONTEXT_RELEASE_FAILED	Failed {0} to release digest context.
+8508E	EAS_ERR_SALT_DIGEST_UNKNOWN_EXCEPTION 	Unrecognized exception thrown generating digest.
+8509E	EAS_ERR_SALT_DIGEST_ALGORITHM_REQUIRED 	Cannot generate a digest without a valid algorithm.
+8510E	EAS_ERR_SALT_CONTEXT_MUST_BE_SUPPLIED 	ICC context must be supplied
+8511E	EAS_ERR_SALT_CREATE_FAILED	Failed {0}.{1} to establish ICC context: {2}
+8512E	EAS_ERR_SALT_SETVALUE_FAILED	Failed {0}: {1}.{2} to set ICC context: {3}
+8513E	EAS_ERR_SALT_ATTACH_FAILED	Failed {0}.{1} to attach ICC context: {2}
+8514E	EAS_ERR_SALT_RANDOM_FAILED	Failed {0} to get random content
+8516E	EAS_ERROR_SALT_MUST_BE_SIZE	A salt value must be {0} bytes long but the provided one is {1} bytes.
+8517E	EAS_ERROR_SALT_DOES_NOT_MATCH_CHECKSUM 	The salt value does not match the recorded checksum.
+8520E	EAS_ERR_SALT_G2SS_INIT_FAILED 	Secure Store initialization failed.
+8521E	EAS_ERR_SALT_G2SS_TOKEN_MUST_BE_INIT 	Hashing with a named salt requires the Secure Store to be initialised.
+8522E	EAS_ERR_SALT_G2SS_SOPIN_NOT_VALID 	The Security Officer
+8523E	EAS_ERR_SALT_G2SS_PIN_NOT_VALID 	The provided Secure Store user PIN is not correct.
+8524E	EAS_ERR_SALT_G2SS_INIT_UNKNOWN_EXCEPTION 	Secure Store initialization failed with an unrecognised exception
+8525E	EAS_ERR_SALT_G2SS_REQUIRED_FOR_LOAD 	Secure Store is required to load salt
+8526E	EAS_ERR_SALT_G2SS_REQUIRED_FOR_GENERATE 	Secure Store is required to generate salt
+8527E	EAS_ERR_SALT_G2SS_REQUIRED_FOR_IMPORT 	Secure Store is required to import salt
+8528E	EAS_ERR_SALT_G2SS_REQUIRED_FOR_EXPORT 	Secure Store is required to export salt
+8529E	EAS_ERR_SALT_G2SS_REQUIRED_FOR_DELETE 	Secure Store is required to delete salt
+8530E	EAS_ERR_SALT_CANNOT_OVERWRITE	You cannot overwrite an existing salt called {0}
+8531E	EAS_ERR_SALT_ADMIN_REQUIRED_FOR_GENERATE 	Administrator access is required to generate salt
+8532E	EAS_ERR_SALT_ADMIN_REQUIRED_FOR_IMPORT 	Administrator access is required to import salt
+8533E	EAS_ERR_SALT_ADMIN_REQUIRED_FOR_EXPORT 	Administrator access is required to export salt
+8534E	EAS_ERR_SALT_ADMIN_REQUIRED_FOR_DELETE 	Administrator access is required to delete salt
+8535E	EAS_ERR_SALT_ADMIN_REQUIRED_FOR_LEGACY 	Administrator access is required to add a legacy salt
+8536E	EAS_ERR_SALT_G2SS_REQUIRED_FOR_LEGACY 	Secure Store is required to add a legacy salt
+8537E	EAS_ERR_SALT_CHECKSUM_DOES_NOT_MATCH	The checksum in the configuration {1} does not match the checksum of the salt {0}
+8538E	EAS_ERR_SALT_G2SS_REQUIRED_FOR_METHOD 	Secure Store is required to change hashing method
+8539E	EAS_ERR_SALT_G2SS_ERROR_CHANGING_METHOD 	Secure Store error changing hashing method
+8540E	EAS_ERR_SALT_WRONG_SIZE	The object called {0} is not a salt
+8541E	EAS_ERR_SALT_BASE64_DECODE_ERROR	Base64 decoding error in salt {0} at character {1}
+8542E	EAS_ERR_SALT_UNINITIALISED 	Must load a salt before using it.
+8543E	EAS_ERR_SALT_NOT_FOUND	There is no salt called {0} in the Secure Store.
+8544E	EAS_ERR_SALT_PASSWORD_NOT_STRONG_ENOUGH	The password must be stronger: {0}
+8545E	EAS_ERR_SALT_ADMIN_NAME_REQUIRED 	Specify -name and the name to use for the salt
+8546E	EAS_ERR_SALT_ADMIN_EXPORT_FILE_REQUIRED 	Specify -file and the filename to use for the exported salt
+8547E	EAS_ERR_SALT_ADMIN_PASSWORD_REQUIRED 	Specify -password and the password to use
+8548E	EAS_ERR_SALT_ADMIN_FILE_WRITE_ERROR	Error opening or writing to {0}
+8549E	EAS_ERR_SALT_ADMIN_FILE_MUST_EXIST	Unable to open {0}
+8550E	EAS_ERR_SALT_ADMIN_FILE_READ_ERROR	Error reading from {0}
+8551E	EAS_ERR_SALT_ADMIN_INI_REQUIRED 	Specify -ini and the filename of the legacy configuration file.
+8552E	EAS_ERR_SALT_ADMIN_IMPORT_FILE_REQUIRED 	Specify -file and the filename from which to import the salt
+8553E	EAS_ERR_SALT_ADMIN_LEGACY_INIFILE_REQUIRED	The legacy configuration file {0} not found
+8554E	EAS_ERR_SALT_ADMIN_LEGACY_SALT_NOT_FOUND	No legacy salt found in {0}
+8555E	EAS_ERR_SALT_ADMIN_IMPORT_FILE_TOO_LARGE	Import file {0} is too large.
+8556E	EAS_ERR_SALT_ADMIN_METHOD_NOT_RECOGNISED	Hashing method {0} not supported.
+8557E	EAS_ERR_SALT_METHOD_DOES_NOT_MATCH	The hashing method in the configuration
+8558E	EAS_ERR_SALT_ADMIN_METHOD_VALUE_REQUIRED 	The -method option must be followed by the hashing method to use with this salt.
+8581E	EAS_ERR_SALT_ADMIN_BAD_COMMAND 	Command processor must be supplied
+8582E	EAS_ERR_SALT_ADMIN_REGISTER_DUPLICATE	There are two commands for {0}.
+8583E	EAS_ERR_SALT_ADMIN_NO_COMMAND	No command specified. Exactly one command should be given, from {0}.
+8584E	EAS_ERR_SALT_ADMIN_MORE_THAN_ONE_COMMAND	More than one command given: {0}.
+8585E	EAS_ERR_SALT_ADMIN_COMMAND_PROCESSOR_BAD_OPTIONS	Command {0} supplying incorrect option count
+8586E	EAS_ERR_SALT_ADMIN_COMMAND_PROCESSOR_BAD_FLAGS	Command {0} supplying incorrect flag count
+8587E	EAS_ERR_SALT_ADMIN_OPTION_OVERLAP	You cannot use {1} as the value of {0}
+8591E	EAS_ERR_SALT_HMAC_ALGORITHM_NOT_AVAILABLE	Failed to get {0} HMAC algorithm from ICC.
+8592E	EAS_ERR_SALT_HMAC_CONTEXT_CREATE_FAILED 	Failed to create an HMAC context.
+8593E	EAS_ERR_SALT_HMAC_CONTEXT_INIT_FAILED	Failed {0} to initialise an HMAC context.
+8594E	EAS_ERR_SALT_HMAC_FAILED	Failed {0} to HMAC block {1}.
+8595E	EAS_ERR_SALT_HMAC_FINAL_FAILED	Failed {0} to complete HMAC.
+8596E	EAS_ERR_SALT_HMAC_CONTEXT_CLEANUP_FAILED	Failed {0} to cleanup HMAC context.
+8597E	EAS_ERR_SALT_HMAC_CONTEXT_RELEASE_FAILED	Failed {0} to release HMAC context.
+8598E	EAS_ERR_SALT_HMAC_UNKNOWN_EXCEPTION 	Unrecognized exception thrown generating HMAC.
+8599E	EAS_ERR_SALT_UNKNOWN_HASHING_METHOD	Unrecognized hashing method
+8601E	EAS_ERR_HASHER_REQUIRES_SECURE_STORE 	Using a named salt requires the Secure Store configured and running
+8602E	EAS_ERR_HASHER_CHECKSUM_DOES_NOT_MATCH	The hashing checksum configured
+8603E	EAS_ERR_HASHER_UNABLE_TO_RECORD_SALT 	Unable to record the configured salt
+8604E	EAS_ERR_HASHER_REQUIRES_FUNCTION 	Using hashing requires a configured hashing function
+8605E	EAS_ERR_HASHER_EPHEMERAL_OR_NAMED_SALT 	Specify either a named salt or an ephemeral one. Can not have both
+8606E	EAS_ERR_HASHER_SALT_REQUIRED 	Hashing requires a salt to be configured.
+8607E	EAS_ERR_HASHER_INVALID_ARGS	Invalid arguments to hashing function. Either a parameter wasn't provided or a buffer was too small
+8701E	EAS_ERR_PARAMETER_NOT_READABLE 	The parameter store does not support a read interface
+8702E	EAS_ERR_PARAMETER_NOT_WRITABLE 	The parameter store does not support a write interface
+9000E	EAS_LIMIT_MAX_OBS_ENT	LIMIT: Maximum number of records ingested: {0}
+9500E	EAS_ERR_TOKEN_LIBRARY_CHECKSUM_MISMATCH	Cannot load token library. The checksum does not match the configuration of this node. Found: [{0}] Expected: [{1}]
+9501E	EAS_TOKEN_LIBRARY_ALREADY_HASHED 	Cannot hash token library. The Token Library contains previous hashed data
+9800E	EAS_ERR_ERROR_READING_CONFIGURATION_FILE_DURING_CHECKSUM_OPERATION	Error opening or reading configuration file [{0}] during configuration checksum calculation.
+9801E	EAS_ERR_UNKNOWN_INPUT_TYPE_TO_CALCULATE_CONFIG_CHECKSUM 	Internal Error: Unknown Input Type to CalculateConfigurationChecksum
+9802E	EAS_ERR_INBOUND_OBS_CONFIG_CHECKSUM_MISMATCH	Configuration checksum on inbound observation [{0}] does not match this nodes configuration checksum [{1}]. Cannot process.
+9803E	EAS_ERR_CALC_CONFIGCHKSUM_AND_PARAMSTORE_CONFIGCHKSUM_DONT_MATCH	The calculated configuration checksum [{0}] does not match the CONFIGURATION_CHECKSUM value in the parameter store [{1}].
+9804E	EAS_ERROR_BAD_XMLCHECKSUM_CALCULATOR_INPUT_TOO_SHORT	Input to configuration checksum calculator [{0}] is too short to be valid XML.
+9805E	EAS_ERROR_BAD_XMLCHECKSUM_CALCULATOR_BAD_PREFIX	Input to configuration checksum calculator [{0}] has incorrect prefix.
+30001	EAS_ERR_INVALID_PRUNE_BEFORE_DATE	Invalid date for PRUNE_BEFORE [{0}]
+30002	EAS_ERR_INVALID_PRUNE_AFTER_DATE	Invalid date for PRUNE_AFTER [{0}]
+30003	EAS_ERR_MISSING_PRUNE_TAGS	Prune action was specified, but no PRUNE_BEFORE or PRUNE_AFTER tags found
+30004	EAS_ERR_WRONG_VALUES_FOR_PRUNE_DATES	Prune action was specified and PRUNE_BEFORE < PRUNE_AFTER
+30011	EAS_ERR_DELETE_WITH_RESOLVE_ONLY	Cannot delete an entity with type RESOLVE_ONLY
+30013	EAS_ERR_PRUNE_WITH_RESOLVE_ONLY	Cannot prune an entity with type RESOLVE_ONLY
+30020	EAS_ERR_SSN_NOT_NUMERIC	SSN is not numeric [{0}]
+30020	EAS_ERR_SSN_IS_INVALID	SSN must have either 4 or 9 digits [{0}]
+30101E	EAS_ERR_INVALID_SESSION_HANDLE	Invalid Session Handle [{0}]
+30102E	EAS_ERR_REPORT_HANDLE	Invalid Report Handle [{0}]
+30103E	EAS_ERR_EXPORT_HANDLE	Invalid Export Handle [{0}]
+30104E	EAS_ERR_CONFIG_HANDLE	Invalid Config Handle [{0}]
+30110E	EAS_ERR_UNKNOWN_COLUMN_REQUESTED_FOR_CSV_EXPORT	Invalid column [{0}] requested for CSV export.
+30110E	EAS_ERR_RESPONSE_MESSAGE_SIZE_LARGER_THAN_BUFFER_SIZE	Response message size [{0}] is larger than buffer size [{1}]
+30111E	EAS_ERR_RESPONSE_RESIZE_FUNCTION_IS_NOT_PROVIDED   	Resize function is not provided
+30112E	EAS_ERR_RESPONSE_RESIZE_FUNCTION_GAVE_INVALID_RESULT   	Resize function returned an invalid result
+30121E	EAS_ERR_JSON_PARSING_FAILURE	JSON Parsing Failure [code={0},offset={1}]
