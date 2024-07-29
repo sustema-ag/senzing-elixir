@@ -1105,7 +1105,8 @@ defmodule Senzing.G2.EngineTest do
 
       assert :ok = Engine.purge_repository()
 
-      assert {:error, %Error{code: 33, message: "Unknown record" <> _}} = Engine.get_entity_by_record_id(id, "TEST")
+      assert {:error, %Error{type: :unknown_dsrc_record_id}} =
+               Engine.get_entity_by_record_id(id, "TEST")
     end
   end
 
