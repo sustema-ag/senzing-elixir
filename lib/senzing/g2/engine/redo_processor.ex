@@ -82,7 +82,7 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
     end
 
     @impl GenStage
-    def handle_info(:check, %__MODULE__{remaining_demand: 0} = state) do
+    def handle_info(:check, state) do
       {events, state} = process(state)
 
       {:noreply, events, state}
