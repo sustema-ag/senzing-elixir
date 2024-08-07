@@ -147,13 +147,13 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
             end
         end
 
-      events =
+      {_empty_count, events} =
         block_processing(fn ->
           1..demand
           |> Task.async_stream(task,
             timeout: state.event_timeout,
             max_concurrency: state.concurrency,
-            ordered: false
+            ordered: true
           )
           |> Stream.map(fn
             {:ok, {:ok, {redo_record, mutation}}} ->
@@ -168,13 +168,21 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
             {:error, reason} ->
               raise reason
           end)
-          |> Enum.reject(&is_nil/1)
-          |> Enum.to_list()
+          |> Enum.reduce_while({0, []}, fn
+            nil, {empty_count, acc} when empty_count >= state.concurrency ->
+              {:halt, {empty_count + 1, acc}}
+
+            nil, {empty_count, acc} ->
+              {:cont, {empty_count + 1, acc}}
+
+            event, {empty_count, acc} ->
+              {:cont, {empty_count, [event | acc]}}
+          end)
         end)
 
       state = %__MODULE__{state | remaining_demand: demand - length(events)}
 
-      {events, state}
+      {Enum.reverse(events), state}
     end
 
     @doc """
