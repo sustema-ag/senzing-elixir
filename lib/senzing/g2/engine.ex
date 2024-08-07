@@ -552,8 +552,7 @@ defmodule Senzing.G2.Engine do
     Nif.get_redo_record()
     |> transform_result(__MODULE__)
     |> case do
-      {:ok, ""} -> {:ok, nil}
-      {:ok, record} -> {:ok, :json.decode(record)}
+      {:ok, record} -> {:ok, maybe_json_decode(record)}
       {:error, reason} -> {:error, reason}
     end
   end
@@ -642,10 +641,10 @@ defmodule Senzing.G2.Engine do
           {{:ok, nil}, telemetry_metadata}
 
         {:ok, {response, info}} when return_info ->
-          {{:ok, {:json.decode(response), :json.decode(info)}}, telemetry_metadata}
+          {{:ok, {maybe_json_decode(response), maybe_json_decode(info)}}, telemetry_metadata}
 
         {:ok, response} when not return_info ->
-          {{:ok, :json.decode(response)}, telemetry_metadata}
+          {{:ok, maybe_json_decode(response)}, telemetry_metadata}
 
         {:error, reason} ->
           {{:error, reason}, telemetry_metadata}
@@ -1575,4 +1574,9 @@ defmodule Senzing.G2.Engine do
   @impl ResourceInit
   @spec resource_destroy() :: G2.result()
   def resource_destroy, do: transform_result(Nif.destroy(), __MODULE__)
+
+  @spec maybe_json_decode(data :: String.t()) :: map() | nil
+  defp maybe_json_decode(data)
+  defp maybe_json_decode(""), do: nil
+  defp maybe_json_decode(data), do: :json.decode(data)
 end
