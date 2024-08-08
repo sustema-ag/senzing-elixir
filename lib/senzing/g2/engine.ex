@@ -763,7 +763,7 @@ defmodule Senzing.G2.Engine do
   @spec get_entity_by_record_id(
           record_id :: record_id(),
           data_source :: data_source(),
-          opts :: []
+          opts :: [flags: flag() | [flag()]]
         ) :: G2.result(entity())
   def get_entity_by_record_id(record_id, data_source, opts \\ []) do
     telemetry_metadata = %{
@@ -808,7 +808,10 @@ defmodule Senzing.G2.Engine do
 
   """
   @doc type: :getting_entities_and_records
-  @spec get_entity(entity_id :: entity_id(), opts :: []) :: G2.result(entity())
+  @spec get_entity(
+          entity_id :: entity_id(),
+          opts :: [flags: flag() | [flag()]]
+        ) :: G2.result(entity())
   def get_entity(entity_id, opts \\ []) do
     telemetry_metadata = %{
       action: :get_entity,
