@@ -95,7 +95,7 @@ defmodule Senzing.MixProject do
       {:ex_doc, "~> 0.34.0", only: :dev, runtime: false},
       {:gen_stage, "~> 1.2", optional: true},
       {:makeup_json, "~> 0.1", only: :dev, runtime: false},
-      {:styler, "~> 0.11.9", runtime: false, only: :dev},
+      {:styler, "~> 1.0.0", runtime: false, only: :dev},
       {:telemetry, "~> 1.2"},
       {:telemetry_poller, "~> 1.1"},
       {:telemetry_registry, "~> 0.3.2"},
