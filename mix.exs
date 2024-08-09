@@ -34,13 +34,9 @@ defmodule Senzing.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: application_mod(Mix.env())
+      mod: {Senzing.Application, []}
     ]
   end
-
-  defp application_mod(env)
-  defp application_mod(:test), do: {Senzing.Application, []}
-  defp application_mod(_env), do: {Senzing.Application, mod: Senzing.G2.Engine}
 
   defp package do
     [
