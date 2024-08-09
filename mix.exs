@@ -16,6 +16,7 @@ defmodule Senzing.MixProject do
       description: "Elixir NIF for Senzing Entity Matching",
       package: package(),
       test_coverage: [tool: ExCoveralls],
+      dialyzer: [plt_add_apps: [:mix]],
       preferred_cli_env: [
         coveralls: :test,
         "coveralls.detail": :test,
