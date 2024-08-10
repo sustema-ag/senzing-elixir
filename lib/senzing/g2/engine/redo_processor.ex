@@ -148,50 +148,39 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
         end
 
       {_empty_count, events} =
-        block_processing(fn ->
-          1..demand
-          |> Task.async_stream(task,
-            timeout: state.event_timeout,
-            max_concurrency: state.concurrency,
-            ordered: true
-          )
-          |> Stream.map(fn
-            {:ok, {:ok, {redo_record, mutation}}} ->
-              %{redo_record: redo_record, mutation: mutation}
+        1..demand
+        |> Task.async_stream(task,
+          timeout: state.event_timeout,
+          max_concurrency: state.concurrency,
+          ordered: true
+        )
+        |> Stream.map(fn
+          {:ok, {:ok, {redo_record, mutation}}} ->
+            %{redo_record: redo_record, mutation: mutation}
 
-            {:ok, {:ok, nil}} ->
-              nil
+          {:ok, {:ok, nil}} ->
+            nil
 
-            {:ok, {:error, reason}} ->
-              raise reason
+          {:ok, {:error, reason}} ->
+            raise reason
 
-            {:error, reason} ->
-              raise reason
-          end)
-          |> Enum.reduce_while({0, []}, fn
-            nil, {empty_count, acc} when empty_count >= state.concurrency ->
-              {:halt, {empty_count + 1, acc}}
+          {:error, reason} ->
+            raise reason
+        end)
+        |> Enum.reduce_while({0, []}, fn
+          nil, {empty_count, acc} when empty_count >= state.concurrency ->
+            {:halt, {empty_count + 1, acc}}
 
-            nil, {empty_count, acc} ->
-              {:cont, {empty_count + 1, acc}}
+          nil, {empty_count, acc} ->
+            {:cont, {empty_count + 1, acc}}
 
-            event, {empty_count, acc} ->
-              {:cont, {empty_count, [event | acc]}}
-          end)
+          event, {empty_count, acc} ->
+            {:cont, {empty_count, [event | acc]}}
         end)
 
       state = %__MODULE__{state | remaining_demand: demand - length(events)}
 
       {Enum.reverse(events), state}
     end
-
-    @doc """
-    Block redo processing until the given function is executed.
-
-    This can be helpful when you want to block the redo processing until a batch
-    import is finished.
-    """
-    @spec block_processing(fun :: (-> result)) :: result when result: term()
-    def block_processing(fun), do: :global.trans({__MODULE__, :block_processing}, fun)
   end
 end
