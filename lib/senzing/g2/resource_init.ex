@@ -103,12 +103,29 @@ defmodule Senzing.G2.ResourceInit do
         "sqlite3://#{Path.join(root_path, "var/sqlite/G2C.db")}"
       )
 
+    pipeline = %{
+      CONFIGPATH: config_path,
+      RESOURCEPATH: resource_path,
+      SUPPORTPATH: support_path
+    }
+
+    pipeline =
+      case Application.fetch_env(:senzing, :license_file) do
+        {:ok, license_file} -> Map.put(pipeline, :LICENSEFILE, license_file)
+        :error -> pipeline
+      end
+
+    pipeline =
+      case Application.fetch_env(:senzing, :license_string_base64) do
+        {:ok, license_string_base64} ->
+          Map.put(pipeline, :LICENSESTRINGBASE64, license_string_base64)
+
+        :error ->
+          pipeline
+      end
+
     %{
-      PIPELINE: %{
-        CONFIGPATH: config_path,
-        RESOURCEPATH: resource_path,
-        SUPPORTPATH: support_path
-      },
+      PIPELINE: pipeline,
       SQL: %{CONNECTION: db_connection}
     }
   end
