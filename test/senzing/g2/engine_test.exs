@@ -38,6 +38,7 @@ defmodule Senzing.G2.EngineTest do
   describe inspect(&Engine.get_active_config_id/0) do
     test "works" do
       assert {:ok, default_config_id} = ConfigManager.get_default_config_id()
+      assert :ok = Engine.reinit(default_config_id)
       assert {:ok, ^default_config_id} = Engine.get_active_config_id()
     end
   end
