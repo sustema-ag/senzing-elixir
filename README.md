@@ -73,6 +73,20 @@ def deps do
 end
 ```
 
+To start the engine, add the following worker to your `Application` or
+`Supervisor`:
+
+```elixir
+{Senzing.G2.ResourceInit, mod: Senzing.G2.Engine, prime: true}
+```
+
+## Dirty IO Nif
+
+Senzing calls take more time than the BEAM schedulers like. They are therefore
+run on Dirty IO schedulers. It is recommended to raise the amount of schedulers
+so that more calls can happen in parallel. Set the following option to start
+50 instead of 10 dirty IO schedulers: `+SDio 50`.
+
 ## Docs
 
 * NIF: <https://hexdocs.pm/senzing>

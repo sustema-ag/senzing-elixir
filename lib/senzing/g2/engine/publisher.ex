@@ -25,14 +25,15 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
     alias Senzing.G2
     alias Senzing.G2.Engine
 
-    @enforce_keys [:concurrency, :produce_change_events, :call_wrapper, :event_timeout]
+    @enforce_keys [:concurrency, :produce_change_events, :call_wrapper, :event_timeout, :ordered]
     defstruct @enforce_keys
 
     @typep t() :: %__MODULE__{
              produce_change_events: boolean(),
              concurrency: pos_integer(),
              call_wrapper: call_wrapper_function(term()) | nil,
-             event_timeout: non_neg_integer()
+             event_timeout: non_neg_integer(),
+             ordered: boolean()
            }
 
     @type add_event(correlation) :: %{
@@ -110,6 +111,7 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
             | {:producer_consumer_options, [GenStage.producer_and_producer_consumer_option()]}
             | {:call_wrapper, call_wrapper_function()}
             | {:event_timeout, non_neg_integer()}
+            | {:ordered, boolean()}
             | GenServer.option()
     @type options() :: [option()]
 
@@ -119,7 +121,8 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
              consumer_options: [GenStage.consumer_option()],
              producer_consumer_options: [GenStage.producer_and_producer_consumer_option()],
              call_wrapper: call_wrapper_function() | nil,
-             event_timeout: non_neg_integer()
+             event_timeout: non_neg_integer(),
+             ordered: boolean()
            }
 
     @spec start_link(options :: options()) :: GenServer.on_start()
@@ -142,14 +145,19 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
     def handle_events(
           events,
           _from,
-          %__MODULE__{concurrency: concurrency, produce_change_events: false, event_timeout: event_timeout} = state
+          %__MODULE__{
+            concurrency: concurrency,
+            produce_change_events: false,
+            event_timeout: event_timeout,
+            ordered: ordered
+          } = state
         ) do
       events
       |> Task.async_stream(
         &handle_event(&1, state),
         timeout: event_timeout,
         max_concurrency: concurrency,
-        ordered: false
+        ordered: ordered
       )
       |> Stream.run()
 
@@ -159,7 +167,12 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
     def handle_events(
           events,
           _from,
-          %__MODULE__{concurrency: concurrency, produce_change_events: true, event_timeout: event_timeout} = state
+          %__MODULE__{
+            concurrency: concurrency,
+            produce_change_events: true,
+            event_timeout: event_timeout,
+            ordered: ordered
+          } = state
         ) do
       events =
         events
@@ -180,7 +193,7 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
           end,
           timeout: event_timeout,
           max_concurrency: concurrency,
-          ordered: false
+          ordered: ordered
         )
         |> Stream.map(fn
           {:ok, {:ok, result}} -> result
@@ -205,7 +218,8 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
       :consumer_options,
       :producer_consumer_options,
       :call_wrapper,
-      :event_timeout
+      :event_timeout,
+      :ordered
     ]
 
     @spec extract_options(options :: options()) ::
@@ -221,7 +235,8 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
               consumer_options: [],
               producer_consumer_options: [],
               call_wrapper: nil,
-              event_timeout: :timer.seconds(5)
+              event_timeout: :timer.seconds(5),
+              ordered: false
             ]
         )
 
@@ -233,13 +248,15 @@ with {:module, GenStage} <- Code.ensure_loaded(GenStage) do
            produce_change_events: produce_change_events,
            concurrency: concurrency,
            call_wrapper: call_wrapper,
-           event_timeout: event_timeout
+           event_timeout: event_timeout,
+           ordered: ordered
          }) do
       %__MODULE__{
         produce_change_events: produce_change_events,
         concurrency: concurrency,
         call_wrapper: call_wrapper,
-        event_timeout: event_timeout
+        event_timeout: event_timeout,
+        ordered: ordered
       }
     end
 

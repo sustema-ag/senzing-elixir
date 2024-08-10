@@ -1,7 +1,17 @@
 defmodule Senzing.G2.ConfigManager.Nif do
   @moduledoc false
 
-  use Senzing.Nif
+  use Senzing.Nif,
+    nifs: [
+      init: [:dirty_io],
+      destroy: [:dirty_io],
+      add_config: [:dirty_io],
+      get_config: [:dirty_io],
+      list_configs: [:dirty_io],
+      get_default_config_id: [:dirty_io],
+      set_default_config_id: [:dirty_io],
+      replace_default_config_id: [:dirty_io]
+    ]
 
   ~z"""
   const beam = @import("beam");
