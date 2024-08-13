@@ -96,7 +96,7 @@ defmodule Senzing.MixProject do
       {:telemetry, "~> 1.2"},
       {:telemetry_poller, "~> 1.1"},
       {:telemetry_registry, "~> 0.3.2"},
-      {:zigler, "~> 0.11.1"}
+      {:zigler, "~> 0.13.1"}
     ]
   end
 end
