@@ -32,27 +32,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: erlef/setup-beam@v1
-        id: setupBEAM
-        with:
-          version-file: .tool-versions
-          version-type: strict
-      - uses: actions/cache@v4
-        with:
-          path:  |
-            _build
-            priv/lib
-          key: mix_format-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
-          restore-keys: |
-            mix_format-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
-      - uses: actions/cache@v4
-        with:
-          path: deps
-          key: mix_format-deps-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
-          restore-keys: |
-            mix_format-deps-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
-      - run: mix deps.get
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: "Setup Runtime Environment"
+        uses: ./.github/actions/setup-runtime-env
+        id: setupRuntimeEnv
+
       - run: mix format --check-formatted
 
   mix_test:
@@ -80,32 +66,43 @@ jobs:
             unstable: true
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: erlef/setup-beam@v1
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - uses: erlef/setup-elixir@v1
         id: setupBEAM
         with:
           otp-version: "${{ matrix.otp }}"
           elixir-version: "${{ matrix.elixir }}"
           version-type: strict
+
       - uses: ./.github/actions/setup-senzing-playground
-      - uses: goto-bus-stop/setup-zig@v2
+
+      - name: Cache Build Directory
+        uses: actions/cache@v4
         with:
-          version: 0.11.0
-      - uses: actions/cache@v4
-        with:
-          path:  |
-            _build
-            priv/lib
-          key: mix_test-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
-          restore-keys: |
-            mix_test-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
-      - uses: actions/cache@v4
+          path: _build
+          key: "${{ format('test-build-{0}-{1}-{2}', matrix.otp, matrix.elixir, hashFiles('mix.exs')) }}"
+          restore-keys: "${{ format('test-build-{0}-{1}-', matrix.otp, matrix.elixir) }}"
+      - name: "Cache Dependencies"
+        uses: actions/cache@v4
         with:
           path: deps
-          key: mix_test-deps-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
-          restore-keys: |
-            mix_test-deps-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
-      - run: mix deps.get
+          key: "${{ format('test-deps-{0}-{1}-{2}', matrix.otp, matrix.elixir, hashFiles('mix.exs')) }}"
+          restore-keys: "${{ format('test-deps-{0}-{1}-', matrix.otp, matrix.elixir) }}"
+      - name: "Cache Zig Binary"
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/zigler
+          key: "${{ format('zigler-{0}', hashFiles('mix.exs')) }}"
+          restore-keys: "zigler-"
+
+      - name: "Install Dependencies"
+        run: mix deps.get --check-locked
+
+      - name: "Install Zig"
+        run: mix zig.get
+
       - run: mix coveralls.multiple --type html --type github
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -120,27 +117,13 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: erlef/setup-beam@v1
-        id: setupBEAM
-        with:
-          version-file: .tool-versions
-          version-type: strict
-      - uses: actions/cache@v4
-        with:
-          path:  |
-            _build
-            priv/lib
-          key: credo-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
-          restore-keys: |
-            credo-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
-      - uses: actions/cache@v4
-        with:
-          path: deps
-          key: credo-deps-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
-          restore-keys: |
-            credo-deps-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
-      - run: mix deps.get
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: "Setup Runtime Environment"
+        uses: ./.github/actions/setup-runtime-env
+        id: setupRuntimeEnv
+
       - run: mix credo
 
   dialyxir:
@@ -149,29 +132,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-      - uses: erlef/setup-beam@v1
-        id: setupBEAM
-        with:
-          version-file: .tool-versions
-          version-type: strict
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
+      - name: "Setup Runtime Environment"
+        uses: ./.github/actions/setup-runtime-env
+        id: setupRuntimeEnv
+
       - uses: ./.github/actions/setup-senzing-playground
-      - uses: goto-bus-stop/setup-zig@v2
+
+      - name: "Cache Dialyzer PLT Files"
+        uses: actions/cache@v4
         with:
-          version: 0.11.0
-      - uses: actions/cache@v4
-        with:
-          path:  |
-            _build
-            priv/lib
-          key: dialyxir-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
-          restore-keys: |
-            dialyxir-build-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
-      - uses: actions/cache@v4
-        with:
-          path: deps
-          key: dialyxir-deps-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-${{ hashFiles('mix.exs') }}
-          restore-keys: |
-            dialyxir-deps-${{ runner.os }}-${{ steps.setupBEAM.outputs.otp-version }}-${{ steps.setupBEAM.outputs.elixir-version }}-
-      - run: mix deps.get
+          path: |
+            ~/.mix/*.plt
+            _build/dev/*.plt
+            _build/dev/*.plt.hash
+          key: "${{ format('mix_dialyzer-dialyzer-{0}-{1}', hashFiles('.tool-versions'), hashFiles('mix.exs')) }}"
+          restore-keys: "${{ format('mix_dialyzer-dialyzer-{0}-', hashFiles('.tool-versions')) }}"
+
       - run: mix dialyzer

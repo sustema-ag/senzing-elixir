@@ -17,7 +17,7 @@ defmodule Senzing.TelemetryTest do
                       reevaluations: 0,
                       repaired_entities: 0
                     }, %{api_version: "3." <> _rest}},
-                   5_000
+                   to_timeout(second: 10)
 
     assert_receive {[:senzing, :g2, :engine, :threads], ^ref,
                     %{
@@ -31,12 +31,12 @@ defmodule Senzing.TelemetryTest do
                       scoring: _,
                       sql_executing: _
                     }, %{api_version: "3." <> _rest}},
-                   5_000
+                   to_timeout(second: 10)
 
     assert_receive {[:senzing, :g2, :engine, :redo_records], ^ref, %{count: 0}, %{}},
-                   5_000
+                   to_timeout(second: 10)
 
     assert_receive {[:senzing, :g2, :engine, :config], ^ref, %{}, %{config: _}},
-                   5_000
+                   to_timeout(second: 10)
   end
 end
