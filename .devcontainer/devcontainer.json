@@ -1,0 +1,35 @@
+{
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "devcontainer",
+  "workspaceFolder": "/workspace",
+  "postCreateCommand": {
+    "asdfInit": "/asdf-post-create.sh",
+    "senzingDbInit": "/senzing-db-post-create.sh",
+    "authorizeVolumnes": "sudo chown -R vscode:vscode /workspace/deps /workspace/_build"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "Kabie.elixir-zigler",
+        "ziglang.vscode-zig",
+        "github.vscode-github-actions",
+        "ms-azuretools.vscode-docker",
+        "elixir-tools.elixir-tools",
+        "GitHub.copilot"
+      ],
+      "settings": {
+        "editor.tabSize": 4,
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "bash",
+            "icon": "terminal-bash"
+          },
+          "zsh": {
+            "path": "zsh"
+          }
+        }
+      }
+    }
+  }
+}
