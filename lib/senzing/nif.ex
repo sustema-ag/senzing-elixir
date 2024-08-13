@@ -6,9 +6,10 @@ defmodule Senzing.Nif do
     opts =
       Keyword.merge(opts,
         otp_app: :senzing,
-        include_dir: [G2.locate_sdk_path()],
-        link_lib: [Path.join(G2.locate_lib_path(), "libG2.so")],
-        local_zig: true
+        c: [
+          include_dirs: [G2.locate_sdk_path()],
+          link_lib: [Path.join(G2.locate_lib_path(), "libG2.so")]
+        ]
       )
 
     quote do
