@@ -61,8 +61,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :write, :start],
-          [:telemetry, :g2, :engine, :write, :stop]
+          [:senzing, :g2, :engine, :write, :start],
+          [:senzing, :g2, :engine, :write, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
@@ -73,19 +73,19 @@ defmodule Senzing.G2.EngineTest do
                  record_id: id
                )
 
-      assert_received {[:telemetry, :g2, :engine, :write, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :write, :start], ^telemetry_ref, %{},
                        %{action: :add_record, load_id: ^id, record_id: ^id, data_source: "TEST"}}
 
-      assert_received {[:telemetry, :g2, :engine, :write, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :write, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :add_record, load_id: ^id, record_id: ^id, data_source: "TEST"}}
 
       assert :ok =
                Engine.add_record(%{"RECORD_ID" => id}, "TEST", load_id: id)
 
-      assert_received {[:telemetry, :g2, :engine, :write, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :write, :start], ^telemetry_ref, %{},
                        %{action: :add_record, load_id: ^id, data_source: "TEST"}}
 
-      assert_received {[:telemetry, :g2, :engine, :write, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :write, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :add_record, load_id: ^id, data_source: "TEST"}}
     end
 
@@ -147,18 +147,18 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :write, :start],
-          [:telemetry, :g2, :engine, :write, :stop]
+          [:senzing, :g2, :engine, :write, :start],
+          [:senzing, :g2, :engine, :write, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
 
       assert :ok = Engine.replace_record(%{"RECORD_ID" => id}, id, "TEST")
 
-      assert_received {[:telemetry, :g2, :engine, :write, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :write, :start], ^telemetry_ref, %{},
                        %{action: :replace_record, load_id: nil, record_id: ^id, data_source: "TEST"}}
 
-      assert_received {[:telemetry, :g2, :engine, :write, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :write, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :replace_record, load_id: nil, record_id: ^id, data_source: "TEST"}}
     end
 
@@ -177,8 +177,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :reevaluate, :start],
-          [:telemetry, :g2, :engine, :reevaluate, :stop]
+          [:senzing, :g2, :engine, :reevaluate, :start],
+          [:senzing, :g2, :engine, :reevaluate, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
@@ -188,10 +188,10 @@ defmodule Senzing.G2.EngineTest do
       assert :ok = Engine.reevaluate_record(id, "TEST")
       assert {:ok, %{"RECORD_ID" => ^id}} = Engine.reevaluate_record(id, "TEST", return_info: true)
 
-      assert_received {[:telemetry, :g2, :engine, :reevaluate, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :reevaluate, :start], ^telemetry_ref, %{},
                        %{action: :reevaluate_record, record_id: ^id, data_source: "TEST"}}
 
-      assert_received {[:telemetry, :g2, :engine, :reevaluate, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :reevaluate, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :reevaluate_record, record_id: ^id, data_source: "TEST"}}
     end
   end
@@ -200,8 +200,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :reevaluate, :start],
-          [:telemetry, :g2, :engine, :reevaluate, :stop]
+          [:senzing, :g2, :engine, :reevaluate, :start],
+          [:senzing, :g2, :engine, :reevaluate, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
@@ -215,10 +215,10 @@ defmodule Senzing.G2.EngineTest do
       assert {:ok, %{"AFFECTED_ENTITIES" => [%{"ENTITY_ID" => ^entity_id}]}} =
                Engine.reevaluate_entity(entity_id, return_info: true)
 
-      assert_received {[:telemetry, :g2, :engine, :reevaluate, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :reevaluate, :start], ^telemetry_ref, %{},
                        %{action: :reevaluate_entity, entity_id: ^entity_id}}
 
-      assert_received {[:telemetry, :g2, :engine, :reevaluate, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :reevaluate, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :reevaluate_entity, entity_id: ^entity_id}}
     end
   end
@@ -249,17 +249,17 @@ defmodule Senzing.G2.EngineTest do
     test "works" do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :process_redo_record, :start],
-          [:telemetry, :g2, :engine, :process_redo_record, :stop]
+          [:senzing, :g2, :engine, :process_redo_record, :start],
+          [:senzing, :g2, :engine, :process_redo_record, :stop]
         ])
 
       assert {:ok, redo_record} = Engine.get_redo_record()
       assert :ok = Engine.process_redo_record(redo_record)
 
-      assert_received {[:telemetry, :g2, :engine, :process_redo_record, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :process_redo_record, :start], ^telemetry_ref, %{},
                        %{action: :process_redo_record}}
 
-      assert_received {[:telemetry, :g2, :engine, :process_redo_record, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :process_redo_record, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :process_redo_record}}
     end
   end
@@ -272,8 +272,8 @@ defmodule Senzing.G2.EngineTest do
     test "works" do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :process_redo_record, :start],
-          [:telemetry, :g2, :engine, :process_redo_record, :stop]
+          [:senzing, :g2, :engine, :process_redo_record, :start],
+          [:senzing, :g2, :engine, :process_redo_record, :stop]
         ])
 
       assert {:ok, %{"DATA_SOURCE" => "TEST", "DSRC_ACTION" => _}} = Engine.process_next_redo_record()
@@ -281,10 +281,10 @@ defmodule Senzing.G2.EngineTest do
       assert {:ok, {%{"DATA_SOURCE" => "TEST", "DSRC_ACTION" => _}, %{"AFFECTED_ENTITIES" => _}}} =
                Engine.process_next_redo_record(return_info: true)
 
-      assert_received {[:telemetry, :g2, :engine, :process_redo_record, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :process_redo_record, :start], ^telemetry_ref, %{},
                        %{action: :process_next_redo_record}}
 
-      assert_received {[:telemetry, :g2, :engine, :process_redo_record, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :process_redo_record, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :process_next_redo_record}}
     end
   end
@@ -293,8 +293,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :write, :start],
-          [:telemetry, :g2, :engine, :write, :stop]
+          [:senzing, :g2, :engine, :write, :start],
+          [:senzing, :g2, :engine, :write, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
@@ -303,10 +303,10 @@ defmodule Senzing.G2.EngineTest do
 
       assert :ok = Engine.delete_record(id, "TEST")
 
-      assert_received {[:telemetry, :g2, :engine, :write, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :write, :start], ^telemetry_ref, %{},
                        %{action: :delete_record, load_id: nil, record_id: ^id, data_source: "TEST"}}
 
-      assert_received {[:telemetry, :g2, :engine, :write, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :write, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :delete_record, load_id: nil, record_id: ^id, data_source: "TEST"}}
 
       assert :ok = Engine.add_record(%{"RECORD_ID" => id}, "TEST")
@@ -327,8 +327,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :read, :start],
-          [:telemetry, :g2, :engine, :read, :stop]
+          [:senzing, :g2, :engine, :read, :start],
+          [:senzing, :g2, :engine, :read, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
@@ -342,10 +342,10 @@ defmodule Senzing.G2.EngineTest do
       assert {:ok, %{"DATA_SOURCE" => "TEST", "RECORD_ID" => ^id} = short_response} =
                Engine.get_record(id, "TEST", flags: [:no_record_default_flags])
 
-      assert_received {[:telemetry, :g2, :engine, :read, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :read, :start], ^telemetry_ref, %{},
                        %{action: :get_record, record_id: ^id, data_source: "TEST"}}
 
-      assert_received {[:telemetry, :g2, :engine, :read, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :read, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :get_record, record_id: ^id, data_source: "TEST"}}
 
       refute Map.has_key?(short_response, "JSON_DATA")
@@ -365,8 +365,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :read, :start],
-          [:telemetry, :g2, :engine, :read, :stop]
+          [:senzing, :g2, :engine, :read, :start],
+          [:senzing, :g2, :engine, :read, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
@@ -380,10 +380,10 @@ defmodule Senzing.G2.EngineTest do
       assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => _entity_id} = short_response}} =
                Engine.get_entity_by_record_id(id, "TEST", flags: :no_entity_default_flags)
 
-      assert_received {[:telemetry, :g2, :engine, :read, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :read, :start], ^telemetry_ref, %{},
                        %{action: :get_entity_by_record_id, record_id: ^id, data_source: "TEST"}}
 
-      assert_received {[:telemetry, :g2, :engine, :read, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :read, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :get_entity_by_record_id, record_id: ^id, data_source: "TEST"}}
 
       refute Map.has_key?(short_response, "ENTITY_NAME")
@@ -397,8 +397,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :read, :start],
-          [:telemetry, :g2, :engine, :read, :stop]
+          [:senzing, :g2, :engine, :read, :start],
+          [:senzing, :g2, :engine, :read, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
@@ -407,10 +407,10 @@ defmodule Senzing.G2.EngineTest do
       assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => entity_id}}} = Engine.get_entity_by_record_id(id, "TEST")
       assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => ^entity_id}}} = Engine.get_entity(entity_id)
 
-      assert_received {[:telemetry, :g2, :engine, :read, :start], ^telemetry_ref, %{},
+      assert_received {[:senzing, :g2, :engine, :read, :start], ^telemetry_ref, %{},
                        %{action: :get_entity, entity_id: ^entity_id}}
 
-      assert_received {[:telemetry, :g2, :engine, :read, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :read, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :get_entity, entity_id: ^entity_id}}
     end
   end
@@ -419,8 +419,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :read, :start],
-          [:telemetry, :g2, :engine, :read, :stop]
+          [:senzing, :g2, :engine, :read, :start],
+          [:senzing, :g2, :engine, :read, :stop]
         ])
 
       id_one = "#{inspect(__MODULE__)}.#{inspect(test)}_one"
@@ -441,9 +441,9 @@ defmodule Senzing.G2.EngineTest do
       assert {:ok, %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => _entity_id, "ENTITY_NAME" => "Apple" <> _}}} =
                Engine.get_virtual_entity([{id_one, "TEST"}, {id_two, "TEST"}])
 
-      assert_received {[:telemetry, :g2, :engine, :read, :start], ^telemetry_ref, %{}, %{action: :get_virtual_entity}}
+      assert_received {[:senzing, :g2, :engine, :read, :start], ^telemetry_ref, %{}, %{action: :get_virtual_entity}}
 
-      assert_received {[:telemetry, :g2, :engine, :read, :stop], ^telemetry_ref, %{duration: _},
+      assert_received {[:senzing, :g2, :engine, :read, :stop], ^telemetry_ref, %{duration: _},
                        %{action: :get_virtual_entity}}
     end
   end
@@ -452,8 +452,8 @@ defmodule Senzing.G2.EngineTest do
     test "works", %{test: test} do
       telemetry_ref =
         :telemetry_test.attach_event_handlers(self(), [
-          [:telemetry, :g2, :engine, :search, :start],
-          [:telemetry, :g2, :engine, :search, :stop]
+          [:senzing, :g2, :engine, :search, :start],
+          [:senzing, :g2, :engine, :search, :stop]
         ])
 
       id = "#{inspect(__MODULE__)}.#{inspect(test)}"
@@ -470,9 +470,9 @@ defmodule Senzing.G2.EngineTest do
       assert {:ok, %{"RESOLVED_ENTITIES" => [%{"ENTITY" => %{"RESOLVED_ENTITY" => %{"ENTITY_ID" => ^entity_id}}}]}} =
                Engine.search_by_attributes(%{"PRIMARY_NAME_ORG" => id})
 
-      assert_received {[:telemetry, :g2, :engine, :search, :start], ^telemetry_ref, %{}, %{}}
+      assert_received {[:senzing, :g2, :engine, :search, :start], ^telemetry_ref, %{}, %{}}
 
-      assert_received {[:telemetry, :g2, :engine, :search, :stop], ^telemetry_ref, %{duration: _}, %{}}
+      assert_received {[:senzing, :g2, :engine, :search, :stop], ^telemetry_ref, %{duration: _}, %{}}
     end
   end
 

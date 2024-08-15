@@ -323,7 +323,7 @@ defmodule Senzing.G2.Engine do
       load_id: opts[:load_id]
     }
 
-    :telemetry.span([:telemetry, :g2, :engine, :write], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :write], telemetry_metadata, fn ->
       data_source
       |> Nif.add_record(
         opts[:record_id],
@@ -397,7 +397,7 @@ defmodule Senzing.G2.Engine do
       load_id: opts[:load_id]
     }
 
-    :telemetry.span([:telemetry, :g2, :engine, :write], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :write], telemetry_metadata, fn ->
       data_source
       |> Nif.replace_record(
         record_id,
@@ -453,7 +453,7 @@ defmodule Senzing.G2.Engine do
       record_id: record_id
     }
 
-    :telemetry.span([:telemetry, :g2, :engine, :reevaluate], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :reevaluate], telemetry_metadata, fn ->
       data_source
       |> Nif.reevaluate_record(record_id, opts[:return_info] || false)
       |> transform_result(__MODULE__)
@@ -497,7 +497,7 @@ defmodule Senzing.G2.Engine do
   def reevaluate_entity(entity_id, opts \\ []) do
     telemetry_metadata = %{action: :reevaluate_entity, entity_id: entity_id}
 
-    :telemetry.span([:telemetry, :g2, :engine, :reevaluate], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :reevaluate], telemetry_metadata, fn ->
       entity_id
       |> Nif.reevaluate_entity(opts[:return_info] || false)
       |> transform_result(__MODULE__)
@@ -583,7 +583,7 @@ defmodule Senzing.G2.Engine do
   def process_redo_record(record, opts \\ []) do
     telemetry_metadata = %{action: :process_redo_record}
 
-    :telemetry.span([:telemetry, :g2, :engine, :process_redo_record], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :process_redo_record], telemetry_metadata, fn ->
       record
       |> :json.encode()
       |> IO.iodata_to_binary()
@@ -627,7 +627,7 @@ defmodule Senzing.G2.Engine do
   def process_next_redo_record(opts \\ []) do
     telemetry_metadata = %{action: :process_next_redo_record}
 
-    :telemetry.span([:telemetry, :g2, :engine, :process_redo_record], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :process_redo_record], telemetry_metadata, fn ->
       return_info = opts[:return_info] || false
 
       return_info
@@ -683,7 +683,7 @@ defmodule Senzing.G2.Engine do
       load_id: opts[:load_id]
     }
 
-    :telemetry.span([:telemetry, :g2, :engine, :write], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :write], telemetry_metadata, fn ->
       data_source
       |> Nif.delete_record(record_id, opts[:load_id], opts[:return_info] || false)
       |> transform_result(__MODULE__)
@@ -730,7 +730,7 @@ defmodule Senzing.G2.Engine do
 
     flags = Flags.normalize(opts[:flags], :record_default_flags)
 
-    :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :read], telemetry_metadata, fn ->
       data_source
       |> Nif.get_record(record_id, flags)
       |> transform_result(__MODULE__)
@@ -774,7 +774,7 @@ defmodule Senzing.G2.Engine do
 
     flags = Flags.normalize(opts[:flags], :entity_default_flags)
 
-    :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :read], telemetry_metadata, fn ->
       data_source
       |> Nif.get_entity_by_record_id(record_id, flags)
       |> transform_result(__MODULE__)
@@ -820,7 +820,7 @@ defmodule Senzing.G2.Engine do
 
     flags = Flags.normalize(opts[:flags], :entity_default_flags)
 
-    :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :read], telemetry_metadata, fn ->
       entity_id
       |> Nif.get_entity(flags)
       |> transform_result(__MODULE__)
@@ -860,7 +860,7 @@ defmodule Senzing.G2.Engine do
 
     flags = Flags.normalize(opts[:flags], :entity_default_flags)
 
-    :telemetry.span([:telemetry, :g2, :engine, :read], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :read], telemetry_metadata, fn ->
       record_ids
       |> Enum.map(fn {id, data_source} -> %{"DATA_SOURCE" => data_source, "RECORD_ID" => id} end)
       |> then(&%{"RECORDS" => &1})
@@ -906,7 +906,7 @@ defmodule Senzing.G2.Engine do
 
     telemetry_metadata = %{search_profile: search_profile}
 
-    :telemetry.span([:telemetry, :g2, :engine, :search], telemetry_metadata, fn ->
+    :telemetry.span([:senzing, :g2, :engine, :search], telemetry_metadata, fn ->
       attributes
       |> :json.encode()
       |> IO.iodata_to_binary()
