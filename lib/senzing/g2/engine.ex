@@ -579,7 +579,7 @@ defmodule Senzing.G2.Engine do
   """
   @doc type: :redo_processing
   @spec process_redo_record(record :: redo_record(), opts :: [return_info: boolean()]) ::
-          G2.result(mutation_info())
+          G2.result() | G2.result(mutation_info() | nil)
   def process_redo_record(record, opts \\ []) do
     telemetry_metadata = %{action: :process_redo_record}
 
@@ -594,7 +594,7 @@ defmodule Senzing.G2.Engine do
           {:ok, telemetry_metadata}
 
         {:ok, info} ->
-          {{:ok, :json.decode(info)}, telemetry_metadata}
+          {{:ok, maybe_json_decode(info)}, telemetry_metadata}
 
         {:error, reason} ->
           {{:error, reason}, telemetry_metadata}
