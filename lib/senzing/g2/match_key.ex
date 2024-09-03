@@ -31,8 +31,7 @@ defmodule Senzing.G2.MatchKey do
   ## <field> ::= <signal><attribute_name>[<relationship>]
   ## <signal> ::= "+" | "-"
   ## <attribute_name> ::= [a-zA-Z_]+
-  ## <relationship> ::= "("[<direction>]relationship_types[<direction>]")"
-  ## <direction> ::= ":"
+  ## <relationship> ::= "("[<relationship_types>]":"[<relationship_types>]")"
   ## <relationship_types> ::= relationship_type[","relationship_type]
   ## <relationship_type> ::= [a-zA-Z_]+
 
@@ -44,9 +43,7 @@ defmodule Senzing.G2.MatchKey do
     [?a..?z, ?A..?Z, ?_] |> utf8_string(min: 1) |> label("relationship type [a-zA-Z_]+")
 
   relationship_types =
-    relationship_type
-    |> concat(repeat(concat(ignore(string(",")), relationship_type)))
-    |> tag(:types)
+    concat(relationship_type, repeat(concat(ignore(string(",")), relationship_type)))
 
   attribute_name =
     [?a..?z, ?A..?Z, ?_]
@@ -58,13 +55,13 @@ defmodule Senzing.G2.MatchKey do
     "("
     |> string()
     |> ignore()
-    |> concat(optional(":" |> string() |> replace(:recipient) |> unwrap_and_tag(:direction)))
-    |> concat(relationship_types)
-    |> concat(optional(":" |> string() |> replace(:initiator) |> unwrap_and_tag(:direction)))
+    |> concat(relationship_types |> tag(:initiating) |> optional())
+    |> concat(":" |> string() |> ignore())
+    |> concat(relationship_types |> tag(:receiving) |> optional())
     |> concat(ignore(string(")")))
-    |> label("relationship :?<relationship_types>:?")
+    |> label("relationship <relationship_types>:<relationship_types>")
     |> reduce({Map, :new, []})
-    |> unwrap_and_tag(:relationship)
+    |> unwrap_and_tag(:disclosed)
     |> optional()
 
   field =
@@ -78,9 +75,9 @@ defmodule Senzing.G2.MatchKey do
   @type match_key() :: %{
           required(:signal) => :positive | :negative,
           required(:attribute_name) => String.t(),
-          optional(:relationship) => %{
-            direction: :initiator | :recipient | nil,
-            types: [String.t()]
+          optional(:disclosed) => %{
+            optional(:receiving) => [String.t()],
+            optional(:initiating) => [String.t()]
           }
         }
 
@@ -101,9 +98,8 @@ defmodule Senzing.G2.MatchKey do
          %{
            signal: :positive,
            attribute_name: "LEI",
-           relationship: %{
-             direction: :recipient,
-             types: ["IS_DIRECTLY_CONSOLIDATED_BY", "IS_ULTIMATELY_CONSOLIDATED_BY"]
+           disclosed: %{
+             receiving: ["IS_DIRECTLY_CONSOLIDATED_BY", "IS_ULTIMATELY_CONSOLIDATED_BY"]
            }
          },
          %{

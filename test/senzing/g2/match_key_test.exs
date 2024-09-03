@@ -13,9 +13,8 @@ defmodule Senzing.G2.MatchKeyTest do
                   %{
                     signal: :positive,
                     attribute_name: "LEI",
-                    relationship: %{
-                      direction: :recipient,
-                      types: ["IS_DIRECTLY_CONSOLIDATED_BY", "IS_ULTIMATELY_CONSOLIDATED_BY"]
+                    disclosed: %{
+                      receiving: ["IS_DIRECTLY_CONSOLIDATED_BY", "IS_ULTIMATELY_CONSOLIDATED_BY"]
                     }
                   }
                 ]}
@@ -40,13 +39,22 @@ defmodule Senzing.G2.MatchKeyTest do
                   %{
                     signal: :positive,
                     attribute_name: "LEI",
-                    relationship: %{
-                      direction: :recipient,
-                      types: ["IS_DIRECTLY_CONSOLIDATED_BY", "IS_ULTIMATELY_CONSOLIDATED_BY"]
+                    disclosed: %{
+                      receiving: ["IS_DIRECTLY_CONSOLIDATED_BY", "IS_ULTIMATELY_CONSOLIDATED_BY"]
                     }
                   },
                   %{signal: :negative, attribute_name: "REGISTRATION_DATE"},
                   %{signal: :negative, attribute_name: "LEI_NUMBER"}
+                ]}
+
+      assert MatchKey.parse("+LEI(IS_FUND_MANAGED_BY:IS_FUND_MANAGED_BY)") ==
+               {:ok,
+                [
+                  %{
+                    signal: :positive,
+                    attribute_name: "LEI",
+                    disclosed: %{receiving: ["IS_FUND_MANAGED_BY"], initiating: ["IS_FUND_MANAGED_BY"]}
+                  }
                 ]}
 
       assert MatchKey.parse("") ==
