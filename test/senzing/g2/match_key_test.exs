@@ -57,6 +57,23 @@ defmodule Senzing.G2.MatchKeyTest do
                   }
                 ]}
 
+      assert MatchKey.parse(
+               "+NAME+WEBSITE+GROUP_ASSOCIATION+REGISTRATION_COUNTRY+MIC+MIC(EXCHANGE_OPERATOR:) (Ambiguous)"
+             ) ==
+               {:ok,
+                [
+                  %{signal: :positive, attribute_name: "NAME"},
+                  %{signal: :positive, attribute_name: "WEBSITE"},
+                  %{signal: :positive, attribute_name: "GROUP_ASSOCIATION"},
+                  %{signal: :positive, attribute_name: "REGISTRATION_COUNTRY"},
+                  %{signal: :positive, attribute_name: "MIC"},
+                  %{
+                    signal: :positive,
+                    attribute_name: "MIC",
+                    disclosed: %{initiating: ["EXCHANGE_OPERATOR"]}
+                  }
+                ]}
+
       assert MatchKey.parse("") ==
                {:ok, []}
 

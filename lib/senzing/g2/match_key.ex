@@ -27,13 +27,14 @@ defmodule Senzing.G2.MatchKey do
   end
 
   ## Grammar
-  ## <match_key> ::= <field>+EOS
+  ## <match_key> ::= <field>+[<ambiguous>]EOS
   ## <field> ::= <signal><attribute_name>[<relationship>]
   ## <signal> ::= "+" | "-"
   ## <attribute_name> ::= [a-zA-Z_]+
   ## <relationship> ::= "("[<relationship_types>]":"[<relationship_types>]")"
   ## <relationship_types> ::= relationship_type[","relationship_type]
   ## <relationship_type> ::= [a-zA-Z_]+
+  ## <ambiguous> ::= " (Ambiguous)"
 
   positive = "+" |> string() |> replace(:positive)
   negative = "-" |> string() |> replace(:negative)
@@ -70,7 +71,15 @@ defmodule Senzing.G2.MatchKey do
     |> concat(relationship)
     |> reduce({Map, :new, []})
 
-  defparsecp(:_parse, choice([field |> times(min: 1) |> concat(eos()), replace(eos(), :empty)]))
+  ambiguous = " (Ambiguous)" |> string() |> ignore()
+
+  defparsecp(
+    :_parse,
+    choice([
+      field |> times(min: 1) |> concat(optional(ambiguous)) |> concat(eos()),
+      replace(eos(), :empty)
+    ])
+  )
 
   @type match_key() :: %{
           required(:signal) => :positive | :negative,
