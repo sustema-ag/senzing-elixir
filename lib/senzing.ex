@@ -11,7 +11,7 @@ defmodule Senzing do
     path =
       System.get_env("SENZING_ROOT", Application.get_env(:senzing, :root_path, "/opt/senzing"))
 
-    unless File.exists?(Path.join(path, "data")) do
+    if !File.exists?(Path.join(path, "data")) do
       raise """
       Invalid Senzing Root Path: #{path}
       """
