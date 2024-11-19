@@ -89,7 +89,7 @@ defmodule Senzing.MixProject do
       {:dialyxir, "~> 1.4", only: :dev, runtime: false},
       {:doctest_formatter, "~> 0.3.0", only: :dev, runtime: false},
       {:excoveralls, "~> 0.18", only: :test},
-      {:ex_doc, "~> 0.34.0", only: :dev, runtime: false},
+      {:ex_doc, "~> 0.35.0", only: :dev, runtime: false},
       {:gen_stage, "~> 1.2", optional: true},
       {:makeup_json, "~> 0.1", only: :dev, runtime: false},
       {:nimble_parsec, "~> 1.4"},
