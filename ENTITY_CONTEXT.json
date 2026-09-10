@@ -2,11 +2,11 @@
   "schema_version": 1,
   "status": "review_branch_pointer_no_product_implementation_authority",
   "owner": "Sustema AG",
-  "version": "1.1",
+  "version": "1.2",
   "last_reviewed": "2026-09-10",
-  "supersedes": "1.0; binds final tested source rendering and knowledge-revision notices",
+  "supersedes": "1.1; pins the reviewed and merged knowledge workflow plus verified integration handback",
   "knowledge_repository": "https://github.com/sustema-ag/entity-programme-control.git",
-  "knowledge_revision": "358ab97d3b0574582864433289285348b3b327b9",
+  "knowledge_revision": "2877d57c2c5719f6ee1b46046daf739b0e752119",
   "context_manifest": "04_ENTITY_ENGINEERING_CONTEXT_MANIFEST.md",
   "context_manifest_sha256": "f1f8f3092c49dff2f4d56756e9ba880e385afb44928da99f6d8b9db2b862228c",
   "entry_route": "component",
@@ -14,5 +14,5 @@
   "application_baseline_revision": "ffc42385dd048b31bd456e086924d87c09f191f8",
   "implementation_authorised": false,
   "component_packet": null,
-  "approval_evidence": "ENT-PDEC-064 approved workflow implementation; working/engineering-context/00_WORK_PACKAGE.md; component specification and execution gates remain."
+  "approval_evidence": "ENT-PDEC-064 approved context workflow; knowledge PR #5 merged; Navraj requested application rollout on 10 September 2026. Product implementation and resource/merge gates remain those of the applicable work package."
 }
