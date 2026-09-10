@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "status": "review_branch_pointer_no_product_implementation_authority",
+  "owner": "Sustema AG",
+  "version": "1.0",
+  "last_reviewed": "2026-09-10",
+  "supersedes": null,
+  "knowledge_repository": "https://github.com/sustema-ag/entity-programme-control.git",
+  "knowledge_revision": "f21119d8611bbad5b3a4bf46fe4270c95bc71803",
+  "context_manifest": "04_ENTITY_ENGINEERING_CONTEXT_MANIFEST.md",
+  "context_manifest_sha256": "f1f8f3092c49dff2f4d56756e9ba880e385afb44928da99f6d8b9db2b862228c",
+  "entry_route": "component",
+  "application_repository": "https://github.com/sustema-ag/senzing-elixir.git",
+  "application_baseline_revision": "ffc42385dd048b31bd456e086924d87c09f191f8",
+  "implementation_authorised": false,
+  "component_packet": null,
+  "approval_evidence": "ENT-PDEC-064 approved workflow implementation; working/engineering-context/00_WORK_PACKAGE.md; component specification and execution gates remain."
+}
